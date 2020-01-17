@@ -1,6 +1,7 @@
 plugins {
     id 'java'
     id 'org.jetbrains.kotlin.jvm' version '1.3.61'
+    id 'maven-publish'
 }
 
 group 'dk.kalhauge'
@@ -23,3 +24,19 @@ compileKotlin {
 compileTestKotlin {
     kotlinOptions.jvmTarget = "1.8"
 }
+
+publishing {
+
+    publications {
+        maven(MavenPublication) {
+            from components.java
+            }
+        }
+
+    repositories {
+        mavenLocal()
+        maven {
+            url = "$buildDir/repo"
+            }
+        }
+    }
