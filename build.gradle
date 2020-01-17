@@ -32,8 +32,8 @@ publishing {
             name = "GitHubPackages"
             url = uri("https://maven.pkg.github.com/eguahlak/document-dsl")
             credentials {
-                username = project.findProperty("gpr.user") ?: System.getenv("USERNAME")
-                password = project.findProperty("gpr.key") ?: System.getenv("PASSWORD")
+                username = project.findProperty("gpr.user") ?: System.getenv("GPR_USER")
+                password = project.findProperty("gpr.key") ?: System.getenv("GPR_API_KEY")
                 }
             }
         }
