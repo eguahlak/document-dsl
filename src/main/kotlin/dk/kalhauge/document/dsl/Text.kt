@@ -51,7 +51,7 @@ class Text(override val document: Document?, val format: Format = NORMAL) : Inli
       '/' -> Text(document, ITALIC).also { target.add(it) }.readContent(chars)
       '_' -> Text(document, UNDERLINE).also { target.add(it) }.readContent(chars)
       '~' -> Text(document, STRIKE).also { target.add(it) }.readContent(chars)
-      '`' -> Text(document, STRIKE).also { target.add(it) }.readContent(chars)
+      '`' -> Text(document, CODE).also { target.add(it) }.readContent(chars)
       else -> UnsupportedOperationException("Unknown $delimiter")
       }
     readContent(chars)
