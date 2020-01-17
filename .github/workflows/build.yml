@@ -1,0 +1,19 @@
+name: build
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  build:
+    name: Build document-dsl jar
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v1
+      - name: Install Kotlin
+        run: snap install --classic kotlin
+      - name: Build with Gradle
+        run: ./gradlew build
+
+
+
