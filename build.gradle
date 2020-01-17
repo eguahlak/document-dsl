@@ -26,17 +26,20 @@ compileTestKotlin {
 }
 
 publishing {
-
-    publications {
-        maven(MavenPublication) {
-            from components.java
-            }
-        }
-
     repositories {
         mavenLocal()
         maven {
-            url = "$buildDir/repo"
+            name = "GitHubPackages"
+            url = uri("https://maven.pkg.github.com/eguahlak/document-dsl")
+            credentials {
+                username = project.findProperty("gpr.user") ?: System.getenv("USERNAME")
+                password = project.findProperty("gpr.key") ?: System.getenv("PASSWORD")
+                }
+            }
+        }
+    publications {
+        gpr(MavenPublication) {
+            from(components.java)
             }
         }
     }
