@@ -10,8 +10,14 @@ import dk.kalhauge.util.normalizePath
 class GfmHandler(val host: Host, val configuration: Configuration, val root: Context) {
   val relations = Relations()
 
-  fun handle() {
+  fun handle(printTargets: Boolean = false, printRelations: Boolean = false) {
     relations.collectFrom(root)
+    if (printTargets) {
+      println("Targets:")
+      Context.targets.forEach { (k, v) -> println("$k --> $v") }
+      println();
+      }
+    if (printRelations) relations.print()
     when (root) {
       is Folder ->  handle(root)
       is Document -> handle(root)
@@ -150,21 +156,20 @@ class GfmHandler(val host: Host, val configuration: Configuration, val root: Con
         is Reference -> {
           val (source) = relations.references[inline] ?: throw IllegalStructure("No relations to: $inline")
           val fullLabel = normalizePath("${source.path}/${inline.label}")
-          val target = inline.target ?: Context.targets[fullLabel]
-          when (target) {
+          when (val target = inline.target ?: Context[fullLabel]) {
             null -> "<Illegal label: ${inline.label}>"
             is Section -> {
               val (destination, level, number, prefix) = relations.sections[target]!!
               val title = if (configuration.hasNumbers) "$prefix ${evaluate(target.title)}"
                           else evaluate(target.title)
-              "[$title](${destination from source}#${title.anchorize()})"
+              "[${inline.title ?: title}](${destination from source}.md#${title.anchorize()})"
               }
             is Resource -> {
               if (target.type == Resource.Type.IMAGE)
                 "![${evaluate(target.title)}](${sourceOf(inline, target)})"
               else "[${evaluate(target.title)}](${sourceOf(inline, target)})"
               }
-            is Document -> "[${evaluate(target.title)}](${target from source}/${target.name}.md)"
+            is Document -> "[${inline.title ?: evaluate(target.title)}](${target from source}.md)"
             else -> "<Unknown target: $target>"
             }
           }

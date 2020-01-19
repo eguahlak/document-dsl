@@ -8,6 +8,16 @@ interface Context {
   var resources: String
   companion object {
     val targets = mutableMapOf<String, Target>()
+    operator fun get(label: String): Target {
+      val target = targets[label]
+      if (target == null) {
+        println("Trying to find: $label")
+        println("Searching...")
+        targets.filter { it.key.endsWith(label) }.forEach { (k, v) -> println("$k --> $v") }
+        throw IllegalStructure("Cant find target")
+        }
+      else return target
+      }
     lateinit var root: Context
     }
   fun add(branch: Context)

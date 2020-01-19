@@ -10,7 +10,10 @@ class Reference(
     builder.append("[$title]($label)")
     }
   override fun isEmpty() = false
+  override fun toString() = nativeString()
+
   data class Relation(val document: Document)
+
   }
 
 fun Inline.Parent.reference(label: String, title: String? = null) =
