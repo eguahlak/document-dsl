@@ -1,56 +1,47 @@
 package dk.kalhauge.document.dsl
 
-interface Context: Target {
-  val name: String
+interface Context {
   val trunk: Context?
   val branches: List<Context>
-  val path: String
+  val name: String
+  val path: String get() = if (trunk == null) name else "${trunk?.path}/$name"
   var resources: String
-
-  fun findTarget(label: String): Target?
-  fun add(context: Context)
-  fun add(label: String, target: Target)
+  companion object {
+    val targets = mutableMapOf<String, Target>()
+    lateinit var root: Context
+    }
+  fun add(branch: Context)
   }
 
 interface Block {
-  val level: Int
-  val document: Document
 
-  fun print(indent: String = "")
-
-  interface Parent : Block {
-    val children: List<Block.Child>
-
-    fun add(child: Block.Child)
-
-    override fun print(indent: String) {
-      children.forEach { it.print("$indent  ") }
+  interface Parent: Block {
+    val children: List<Child>
+    fun add(child: Child)
+    operator fun String.unaryPlus() {
+      val content = this
+      paragraph { text(content) }
       }
-
     }
 
-  abstract class Child(val parent: Parent) : Block {
-    override val level = parent.level + 1
-    val index = parent.children.size
-    override val document: Document
-      get() = parent.document
-    }
+  interface Child: Block
 
   }
 
 interface Inline {
-  val document: Document?
+  fun isEmpty(): Boolean
   fun nativeString(builder: StringBuilder)
   fun nativeString() = buildString { nativeString(this) }
 
-  fun nakedString(builder: StringBuilder)
-  fun nakedString() = buildString { nakedString(this) }
-
   interface Parent {
-    val document: Document?
-    val parts: MutableList<Inline>
+    val parts: List<Inline>
     fun add(part: Inline)
+    operator fun String.unaryPlus() {
+      val content = this
+      text(content)
+      }
     }
+
   }
 
 class IllegalStructure: RuntimeException()

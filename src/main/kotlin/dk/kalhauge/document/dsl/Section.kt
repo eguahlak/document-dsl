@@ -1,30 +1,19 @@
 package dk.kalhauge.document.dsl
 
-class Section(parent: Block.Parent, title: String?, label: String?) : Block.Child(parent), Block.Parent, Target {
-  var title: Text = text(title)
+import dk.kalhauge.util.anchorize
+
+class Section(title: String?, label: String): Block.Child, Block.Parent, Target {
+  var title = text(title)
+  override val label = "sec:$label"
   override val children = mutableListOf<Block.Child>()
-  private var position = parent.children.filter { it is Section }.size + 1
-  var number: String = if (parent is Section) "${parent.number}.$position" else "$position"
+  override fun add(child: Block.Child) { children += child }
 
-  override val label = if (label == null) "sec:$number" else "sec:$label"
-
-  init {
-    parent.add(this)
-    }
-
-  override fun add(child: Block.Child) {
-    children += child
-    }
-
-  override fun print(indent: String) {
-    println("${indent}Section: ${title.nativeString()}")
-    super.print(indent)
-    }
-
-  override fun toString(): String = "Section: $title"
-
+  data class Relation(val document: Document, val level: Int, val number: Int, val prefix: String)
   }
 
-fun Block.Parent.section(title: String? = null, label: String? = null, build: Section.() -> Unit = {}) =
-    Section(this, title, label).also(build)
+fun Block.Parent.section(title: String, label: String? = null, build: Section.() -> Unit = {}) =
+    Section(title, label ?: title.anchorize()).also {
+      it.build()
+      add(it)
+      }
 

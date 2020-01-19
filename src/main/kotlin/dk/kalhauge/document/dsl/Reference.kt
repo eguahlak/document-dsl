@@ -1,30 +1,23 @@
 package dk.kalhauge.document.dsl
 
 class Reference(
-    override val document: Document?,
-    target: Target?,
+    var target: Target?,
     val label: String,
     val title: String?
-) : Inline {
-  var target: Target? = target
-    get(): Target? {
-      if (field == null) field = document?.findTarget(label)
-      return field
-    }
-    set(value) { field = value }
+    ) : Inline {
+
   override fun nativeString(builder: StringBuilder) {
     builder.append("[$title]($label)")
+    }
+  override fun isEmpty() = false
+  data class Relation(val document: Document)
   }
-  override fun nakedString(builder: StringBuilder) {
-    builder.append("[$title]($label)")
-  }
-}
 
 fun Inline.Parent.reference(label: String, title: String? = null) =
-    Reference(document, null, label, title).also { this.add(it) }
+    Reference(null, label, title).also { this.add(it) }
 
 fun Inline.Parent.reference(target: Target, title: String? = null) =
-    Reference(document, target, target.label, title).also { this.add(it) }
+    Reference(target, target.label, title).also { this.add(it) }
 
 interface Target {
   val label: String
