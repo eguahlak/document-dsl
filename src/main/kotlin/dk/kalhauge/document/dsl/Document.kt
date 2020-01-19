@@ -22,7 +22,7 @@ class Document(
       }
 
   override fun add(branch: Context) {
-    throw IllegalStructure()
+    throw IllegalStructure("No branches can be added to documents")
     }
 
   init {

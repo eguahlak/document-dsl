@@ -148,7 +148,7 @@ class GfmHandler(val host: Host, val configuration: Configuration, val root: Con
         is Text ->  if (inline.isEmpty()) """\${inline.format.delimiter}"""
         else inline.parts.joinToString("") { evaluate(it) } with inline.format
         is Reference -> {
-          val (source) = relations.references[inline]!!
+          val (source) = relations.references[inline] ?: throw IllegalStructure("No relations to: $inline")
           val fullLabel = normalizePath("${source.path}/${inline.label}")
           val target = inline.target ?: Context.targets[fullLabel]
           when (target) {

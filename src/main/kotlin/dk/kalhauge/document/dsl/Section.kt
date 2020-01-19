@@ -2,7 +2,7 @@ package dk.kalhauge.document.dsl
 
 import dk.kalhauge.util.anchorize
 
-class Section(title: String?, label: String): Block.Child, Block.Parent, Target {
+class Section(title: String, label: String): Block.Child, Block.Parent, Target {
   var title = text(title)
   override val label = "sec:$label"
   override val children = mutableListOf<Block.Child>()

@@ -44,4 +44,4 @@ interface Inline {
 
   }
 
-class IllegalStructure: RuntimeException()
+class IllegalStructure(message: String): RuntimeException(message)
