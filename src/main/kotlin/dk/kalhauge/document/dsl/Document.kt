@@ -12,7 +12,6 @@ class Document(
   override val branches = emptyList<Context>()
   override val children = mutableListOf<Block.Child>()
   var title = text(title)
-  override fun add(child: Block.Child) { children += child }
   private var resourcePath: String? = null
   override var resources: String
     get() = trunk?.resources ?: "$name/${resourcePath?:"resources"}"
@@ -20,6 +19,8 @@ class Document(
       if (trunk == null) resourcePath = value
       else trunk.resources = "$name/$value"
       }
+
+  override fun add(child: Block.Child?) { if (child != null) children += child }
 
   override fun add(branch: Context) {
     throw IllegalStructure("No branches can be added to documents")

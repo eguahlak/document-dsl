@@ -43,7 +43,7 @@ class Table: Block.Child {
 
     init { table.rows += this }
 
-    override fun add(child: Block.Child) { children += child }
+    override fun add(child: Block.Child?) { if (child != null) children += child }
     }
 
   }

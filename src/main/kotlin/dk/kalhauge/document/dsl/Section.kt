@@ -6,7 +6,7 @@ class Section(title: String, label: String): Block.Child, Block.Parent, Target {
   var title = text(title)
   override val label = "sec:$label"
   override val children = mutableListOf<Block.Child>()
-  override fun add(child: Block.Child) { children += child }
+  override fun add(child: Block.Child? ) { if (child != null) children += child }
 
   data class Relation(val document: Document, val level: Int, val number: Int, val prefix: String)
   }

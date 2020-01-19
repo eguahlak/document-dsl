@@ -27,7 +27,7 @@ interface Block {
 
   interface Parent: Block {
     val children: List<Child>
-    fun add(child: Child)
+    fun add(child: Child?)
     operator fun String.unaryPlus() {
       val content = this
       paragraph { text(content) }

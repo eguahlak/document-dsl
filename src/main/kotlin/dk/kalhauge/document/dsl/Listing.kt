@@ -9,7 +9,7 @@ class Listing(val type: Type) : Block.Child, Block.Parent {
 
   override val children = mutableListOf<Block.Child>()
 
-  override fun add(child: Block.Child) { children += child }
+  override fun add(child: Block.Child?) { if (child != null) children += child }
 
   }
 
