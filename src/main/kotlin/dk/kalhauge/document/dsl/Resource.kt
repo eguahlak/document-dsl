@@ -17,7 +17,7 @@ sealed class Address(val path: String) {
   class Disk(path: String) : Address(path)
   }
 
-class Resource(
+open class Resource(
     val source: Address,
     label: String?,
     title: String?
@@ -25,7 +25,7 @@ class Resource(
   enum class Type { LINK, DOCUMENT, IMAGE }
   var type = Type.LINK
   var title: Text
-  var link: String? = null
+  var name: String? = null
   override val label = "res".label(label) { (Context.targets.filter { (label, target) -> target is Resource }.size + 1).toString() }
   override fun isEmpty() = false
 
@@ -93,7 +93,7 @@ fun Inline.Parent.document(
     ) =
     Resource(Address(url), title, label).also {
       it.type = Resource.Type.DOCUMENT
-      it.link = "${url.toMD5()}-${link}"
+      it.name = "${url.toMD5()}-${link}"
       it.build()
       reference(it)
       }
@@ -107,7 +107,7 @@ fun Block.Parent.document(
     ) =
     Resource(Address(url), title, label).apply {
       type = Resource.Type.DOCUMENT
-      this.link = "${url.toMD5()}-${link}"
+      this.name = "${url.toMD5()}-${link}"
       build()
       }
 
@@ -120,7 +120,7 @@ fun Inline.Parent.image(
     ) =
     Resource(Address(url), title, label).also {
       it.type = Resource.Type.IMAGE
-      it.link = "${url.toMD5()}-${link}"
+      it.name = "${url.toMD5()}-${link}"
       it.build()
       reference(it)
       }
@@ -134,6 +134,6 @@ fun Block.Parent.image(
     ) =
     Resource(Address(url), title, label).apply {
       type = Resource.Type.IMAGE
-      this.link = "${url.toMD5()}-${link}"
+      this.name = "${url.toMD5()}-${link}"
       build()
       }

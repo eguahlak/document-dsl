@@ -130,20 +130,20 @@ class GfmHandler(val host: Host, val configuration: Configuration, val root: Con
       Resource.Type.DOCUMENT -> {
         when (resource.source) {
           is Address.Disk ->
-              host.updateFile(resource.source.path, "${root.resources}/${resource.link!!}")
+              host.updateFile(resource.source.path, "${root.resources}/${resource.name!!}")
           is Address.Web ->
-              host.downloadFile(resource.source.path, "${root.resources}/${resource.link!!}")
+              host.downloadFile(resource.source.path, "${root.resources}/${resource.name!!}")
           }
-        "${root.resources}/${resource.link}" from reference.document.path
+        "${root.resources}/${resource.name}" from reference.document.path
         }
       Resource.Type.IMAGE -> {
         when (resource.source) {
           is Address.Disk ->
-            host.updateFile(resource.source.path, "${root.resources}/${resource.link}")
+            host.updateFile(resource.source.path, "${root.resources}/${resource.name}")
           is Address.Web ->
-            host.downloadFile(resource.source.path, "${root.resources}/${resource.link}")
+            host.downloadFile(resource.source.path, "${root.resources}/${resource.name}")
           }
-        "${root.resources}/${resource.link}" from reference.document.path
+        "${root.resources}/${resource.name}" from reference.document.path
         }
       }
 
