@@ -54,7 +54,7 @@ fun Inline.Parent.resource(
       reference(it.label)
       }
 
-fun Document.resource(
+fun resource(
     source: Address,
     label: String? = null,
     title: String? = null,
@@ -73,7 +73,7 @@ fun Inline.Parent.link(
       reference(it)
     }
 
-fun Block.Parent.link(
+fun link(
     url: String,
     label: String? = null,
     title: String? = null,
@@ -98,7 +98,7 @@ fun Inline.Parent.document(
       reference(it)
       }
 
-fun Block.Parent.document(
+fun document(
     url: String,
     link: String,
     label: String? = null,
@@ -125,7 +125,7 @@ fun Inline.Parent.image(
       reference(it)
       }
 
-fun Block.Parent.image(
+fun image(
     url: String,
     link: String,
     label: String? = null,
