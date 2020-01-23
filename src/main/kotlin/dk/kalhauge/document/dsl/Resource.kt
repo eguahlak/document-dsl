@@ -17,7 +17,7 @@ sealed class Address(val path: String) {
   class Disk(path: String) : Address(path)
   }
 
-open class Resource(
+class Resource(
     val source: Address,
     label: String?,
     title: String?
