@@ -4,6 +4,7 @@ import dk.kalhauge.util.label
 import dk.kalhauge.util.toMD5
 
 sealed class Address(val path: String) {
+  abstract val label: String
   companion object {
     operator fun invoke(path: String): Address {
       if (
@@ -13,8 +14,12 @@ sealed class Address(val path: String) {
       else return Disk(path)
       }
     }
-  class Web(path: String) : Address(path)
-  class Disk(path: String) : Address(path)
+  class Web(path: String) : Address(path) {
+    override val label = "web-${path.substringAfterLast("//")}"
+    }
+  class Disk(path: String) : Address(path){
+    override val label = "disk-$path"
+    }
   }
 
 class Resource(
@@ -26,13 +31,13 @@ class Resource(
   var type = Type.LINK
   var title: Text
   var name: String? = null
-  override val label = "res".label(label) { (Context.targets.filter { (label, target) -> target is Resource }.size + 1).toString() }
+  override val label = "res".label(label) { source.label }
   override fun isEmpty() = false
 
   init {
-    Context.targets[this.label] = this
+    // Context.targets[this.label] = this
     if (title != null) this.title = text(title)
-    else this.title = code(source.path)
+    else this.title = code(source.path.substringAfterLast("/"))
     }
 
   override fun nativeString(builder: StringBuilder) {
