@@ -39,10 +39,8 @@ fun normalizePath(path: String): String {
 
 operator fun String.minus(postfix: String) = if (this.isNotBlank()) "$this$postfix" else ""
 
-/*
+
 fun main() {
-  println(normalizePath("soft2020spring/ALG/course-info/top"))
-  println(normalizePath("soft2020spring/ALG/course-info/../top"))
-  println(normalizePath("soft2020spring/ALG/course-info/../../AI/course-info/top"))
+  println(-3 of "*")
+  println(3 of "*")
   }
-*/

@@ -97,4 +97,4 @@ fun Text.italic(content: String? = null, build: Text.() -> Unit = {}) = text(con
 fun Text.underline(content: String? = null, build: Text.() -> Unit = {}) = text(content, UNDERLINE, build)
 fun Text.strike(content: String? = null, build: Text.() -> Unit = {}) = text(content, STRIKE, build)
 
-
+fun String.toText() = text(this)
