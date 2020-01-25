@@ -2,10 +2,7 @@ package dk.kalhauge.document.handler
 
 import dk.kalhauge.document.dsl.*
 import dk.kalhauge.document.dsl.Text.Format.*
-import dk.kalhauge.util.anchorize
-import dk.kalhauge.util.of
-import dk.kalhauge.util.from
-import dk.kalhauge.util.normalizePath
+import dk.kalhauge.util.*
 
 class GfmHandler(val host: Host, val configuration: Configuration, val root: Context) {
   val relations = Relations()
@@ -124,50 +121,44 @@ class GfmHandler(val host: Host, val configuration: Configuration, val root: Con
 
   val Reference.document: Document get() = relations.references[this]!!.document
 
-  fun sourceOf(reference: Reference, resource: Resource) =
-    when (resource.type) {
-      Resource.Type.LINK -> resource.source.path
-      Resource.Type.DOCUMENT -> {
-        when (resource.source) {
-          is Address.Disk ->
-              host.updateFile(resource.source.path, "${root.resources}/${resource.name!!}")
-          is Address.Web ->
-              host.downloadFile(resource.source.path, "${root.resources}/${resource.name!!}")
-          }
-        "${root.resources}/${resource.name}" from reference.document.path
-        }
-      Resource.Type.IMAGE -> {
+  private fun sourceOf(reference: Reference, resource: Resource) =
+    when (resource) {
+      is CachedResource -> {
         when (resource.source) {
           is Address.Disk ->
             host.updateFile(resource.source.path, "${root.resources}/${resource.name}")
           is Address.Web ->
-            host.downloadFile(resource.source.path, "${root.resources}/${resource.name}")
+            host.downloadFile(resource.source.url, "${root.resources}/${resource.name}")
           }
         "${root.resources}/${resource.name}" from reference.document.path
         }
+      else -> resource.source.url
       }
 
   fun evaluate(inline: Inline?): String =
       when (inline) {
         null -> ""
         is Content -> inline.value
-        is Text ->  if (inline.isEmpty()) """\${inline.format.delimiter}"""
-        else inline.parts.joinToString("") { evaluate(it) } with inline.format
+        is Text ->
+            if (inline.isEmpty()) """\${inline.format.delimiter}"""
+            else inline.parts.joinToString("") { evaluate(it) } with inline.format
         is Reference -> {
-          val (source) = relations.references[inline] ?: throw IllegalStructure("No relations to: $inline")
-          val fullLabel = normalizePath("${source.path}/${inline.label}")
-          when (val target = inline.target ?: Context[fullLabel]) {
-            null -> "<Illegal label: ${inline.label}>"
+          // val (source) = relations.references[inline] ?: throw IllegalStructure("No relations to: $inline")
+          val source = inline.document
+          //val fullLabel = normalizePath("${source.path}/${inline.label}")
+          when (val target = inline.target.fixFrom(source)) { // TODO Check
+            null -> "<Illegal label: ${inline.target.label}>"
             is Section -> {
               val (destination, level, number, prefix) = relations.sections[target]!!
               val title = if (configuration.hasNumbers) "$prefix ${evaluate(target.title)}"
                           else evaluate(target.title)
-              "[${inline.title ?: title}](${destination from source}.md#${title.anchorize()})"
+              "[${inline.title ?: title}](${(destination from source) - ".md"}#${title.anchorize()})"
+              }
+            is CachedResource -> {
+              "${if (target.render) "!" else ""}[${evaluate(target.title)}](${sourceOf(inline, target)})"
               }
             is Resource -> {
-              if (target.type == Resource.Type.IMAGE)
-                "![${evaluate(target.title)}](${sourceOf(inline, target)})"
-              else "[${evaluate(target.title)}](${sourceOf(inline, target)})"
+              "[${evaluate(target.title)}](${sourceOf(inline, target)})"
               }
             is Document -> "[${inline.title ?: evaluate(target.title)}](${target from source}.md)"
             else -> "<Unknown target: $target>"

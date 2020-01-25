@@ -21,10 +21,6 @@ fun relate(target: Path<String>?, source: Path<String>?, noDots: Boolean = true)
 fun String.toMD5() =
   MessageDigest.getInstance("MD5").digest(this.toByteArray()).take(4).joinToString("") { "%02x".format(it) }
 
-fun String.label(value: String?, alternative: () -> String) =
-    if (value == null) "$this:${alternative()}"
-    else "$this:$value"
-
 fun MutableList<*>.remove() { this.removeAt(this.size - 1) }
 
 fun normalizePath(path: String): String {
@@ -40,6 +36,8 @@ fun normalizePath(path: String): String {
     }
   return normalized.joinToString("/")
   }
+
+operator fun String.minus(postfix: String) = if (this.isNotBlank()) "$this$postfix" else ""
 
 /*
 fun main() {

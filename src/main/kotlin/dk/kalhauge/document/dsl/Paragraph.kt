@@ -2,7 +2,9 @@ package dk.kalhauge.document.dsl
 
 class Paragraph: Block.Child, Inline.Parent {
   override val parts = mutableListOf<Inline>()
-  override fun add(part: Inline) { parts += part }
+  override fun add(part: Inline) {
+    parts += part
+    }
   }
 
 fun Block.Parent.paragraph(content: String? = null, build: Paragraph.() -> Unit = {}) =

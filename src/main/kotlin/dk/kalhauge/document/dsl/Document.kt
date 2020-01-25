@@ -30,6 +30,8 @@ class Document(
     if (trunk == null) Context.root = this
     else trunk.add(this)
     }
+
+  override fun toString() = """Document($path)"""
   }
 
 fun document(

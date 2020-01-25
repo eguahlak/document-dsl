@@ -17,9 +17,9 @@ fun Folder.full() = document("full", "Main Page") {
         reference("../week-06/info/top", "Go to week 6")
         }
       paragraph {
-        image("/Users/AKA/Pictures/Michellaneous/raven.png", link = "raven.png")
-        image("$root/images/raven.png", link = "raven.png")
-        image("http://www.kalhauge.dk/Mathias/mig_selv.png", link = "migselv.png")
+        image("/Users/AKA/Pictures/Michellaneous/raven.png", name = "raven.png")
+        image("$root/images/raven.png", name = "raven.png")
+        image("http://www.kalhauge.dk/Mathias/mig_selv.png", name = "migselv.png")
         }
       paragraph("another text")
       java("""
@@ -62,7 +62,7 @@ fun Folder.full() = document("full", "Main Page") {
             }
           text(" decision")
           }
-        text { reference(s1) }
+        paragraph { reference(s1) }
       }
 
       table {
@@ -96,7 +96,9 @@ fun Folder.small() = document("week-06/info", "Sorting algorithms") {
   list {
     paragraph("First")
     paragraph("Second") {
-      reference("../../full/sec:second")
+      text(":pencil: ") {
+        reference("../../full/sec:second")
+        }
       }
     }
   section("Insertion sort") {

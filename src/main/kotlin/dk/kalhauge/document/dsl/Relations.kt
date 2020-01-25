@@ -7,10 +7,16 @@ class Relations {
 
   fun print() {
     println("Sections:")
-    sections.forEach { t, u -> println("$t --> $u") }
+    sections.forEach { (t, u) ->
+      println("$t")
+      println(" --> $u")
+      }
     println()
     println("References:")
-    references.forEach { t, u -> println("$t --> $u") }
+    references.forEach { (t, u) ->
+      println("$t")
+      println(" --> $u")
+      }
     println()
     }
 

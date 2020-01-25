@@ -1,144 +1,117 @@
 package dk.kalhauge.document.dsl
 
-import dk.kalhauge.util.label
 import dk.kalhauge.util.toMD5
 
-sealed class Address(val path: String) {
+sealed class Address {
   abstract val label: String
+  abstract val title: String
+  abstract val url: String
+  fun after(delimiter: String) = url.substringAfterLast(delimiter)
   companion object {
-    operator fun invoke(path: String): Address {
+    operator fun invoke(source: String) =
       if (
-          path.startsWith("http://", ignoreCase = true) ||
-          path.startsWith("https://", ignoreCase = true)
-          ) return Web(path)
-      else return Disk(path)
-      }
+        source.startsWith("http://", ignoreCase = true) ||
+        source.startsWith("https://", ignoreCase = true)
+        )  Web(source)
+      else Disk(source)
     }
-  class Web(path: String) : Address(path) {
-    override val label = "web-${path.substringAfterLast("//")}"
+  class Web(override val url: String) : Address() {
+    override val label = "web-${after("//")}"
+    override val title = after("//")
     }
-  class Disk(path: String) : Address(path){
+  class Disk(val path: String) : Address(){
+    override val url = "file://$path"
     override val label = "disk-$path"
+    override val title = after("/")
     }
+  object System : Address() {
+    override val label = "system"
+    override val url = "system://$label"
+    override val title = "System resource"
+    }
+  override fun toString() = """"$url""""
   }
 
-class Resource(
+open class Resource(
     val source: Address,
-    label: String?,
-    title: String?
-    ): Inline, Target {
-  enum class Type { LINK, DOCUMENT, IMAGE }
-  var type = Type.LINK
-  var title: Text
-  var name: String? = null
-  override val label = "res".label(label) { source.label }
-  override fun isEmpty() = false
+    title: String?,
+    label: String?
+    ) : Inline, Target {
+  val title: Text
+  final override val label: String
 
   init {
-    // Context.targets[this.label] = this
-    if (title != null) this.title = text(title)
-    else this.title = code(source.path.substringAfterLast("/"))
+    if (title == null) this.title = code(source.title)
+    else this.title = text(title)
+    if (label == null) this.label = "res:${source.label}"
+    else this.label = label
     }
 
   override fun nativeString(builder: StringBuilder) {
-    builder.append("[$title](${source.path})")
+    builder.append("[$title](${source.url})")
     }
+  override fun isEmpty() = false
 
-  override fun toString() = "Resource: $title -> ${source.path}"
+  override fun toString() = """Resource(source=$source, title="$title", label="$label")"""
+  }
+
+class CachedResource(
+    source: Address,
+    title: String?,
+    label: String?,
+    name: String?,
+    render: Boolean?
+    ) : Resource(source, title, label) {
+  val name: String = "${source.url.toMD5()}-${name ?: source.url.substringAfterLast("/")}"
+  val render: Boolean = render ?: when (source.after(".")) {
+    "png", "img", "jpg", "jpeg" -> true
+    else -> false
+    }
+  val follow get() = !render
+
+  override fun nativeString(builder: StringBuilder) {
+    builder.append("[$title](${source.url})")
+    }
 
   }
 
-fun Inline.Parent.resource(
-    source: Address,
-    label: String? = null,
-    title: String? = null,
-    build: Resource.() -> Unit = {}
-    ) =
-    Resource(source, title, label).also {
-      it.build()
-      reference(it.label)
-      }
+fun website(url: String, title: String? = null, label: String? = null) =
+    Resource(Address.Web(url), title, label)
 
-fun resource(
-    source: Address,
-    label: String? = null,
-    title: String? = null,
-    build: Resource.() -> Unit = {}
-    ) = Resource(source, title, label).also(build)
+fun Inline.Parent.website(url: String, title: String? = null, label: String? = null) =
+    Resource(Address.Web(url), title, label).also { reference(it) }
 
-fun Inline.Parent.link(
-    url: String,
-    label: String? = null,
-    title: String? = null,
-    build: Resource.() -> Unit = {}
-    ) =
-    Resource(Address.Web(url), title, label).also {
-      it.type = Resource.Type.LINK
-      it.build()
-      reference(it)
-    }
 
-fun link(
-    url: String,
-    label: String? = null,
+fun cached(
+    source: String,
     title: String? = null,
-    build: Resource.() -> Unit = {}
+    label: String? = null,
+    name: String? = null,
+    render: Boolean? = null
     ) =
-    Resource(Address.Web(url), title, label).apply {
-      type = Resource.Type.LINK
-      build()
-      }
+    CachedResource(Address(source), title, label, name, render)
 
-fun Inline.Parent.document(
-    url: String,
-    link: String,
-    label: String? = null,
+fun Inline.Parent.cached(
+    source: String,
     title: String? = null,
-    build: Resource.() -> Unit = {}
+    label: String? = null,
+    name: String? = null,
+    render: Boolean? = null
     ) =
-    Resource(Address(url), title, label).also {
-      it.type = Resource.Type.DOCUMENT
-      it.name = "${url.toMD5()}-${link}"
-      it.build()
+    CachedResource(Address(source), title, label, name, render).also {
       reference(it)
       }
 
-fun document(
-    url: String,
-    link: String,
-    label: String? = null,
-    title: String? = null,
-    build: Resource.() -> Unit = {}
-    ) =
-    Resource(Address(url), title, label).apply {
-      type = Resource.Type.DOCUMENT
-      this.name = "${url.toMD5()}-${link}"
-      build()
-      }
+fun Inline.Parent.link(url: String, title: String? = null, label: String? = null, name: String? = null) =
+  if (name == null) website(url, title, label)
+  else cached(url, title, label, name, false)
 
-fun Inline.Parent.image(
-    url: String,
-    link: String,
-    label: String? = null,
-    title: String? = null,
-    build: Resource.() -> Unit = {}
-    ) =
-    Resource(Address(url), title, label).also {
-      it.type = Resource.Type.IMAGE
-      it.name = "${url.toMD5()}-${link}"
-      it.build()
-      reference(it)
-      }
+fun Inline.Parent.image(url: String, title: String? = null, label: String? = null, name: String? = null) =
+  cached(url, title, label, name, true)
 
-fun image(
-    url: String,
-    link: String,
-    label: String? = null,
-    title: String? = null,
-    build: Resource.() -> Unit = {}
-    ) =
-    Resource(Address(url), title, label).apply {
-      type = Resource.Type.IMAGE
-      this.name = "${url.toMD5()}-${link}"
-      build()
-      }
+fun link(url: String, title: String? = null, label: String? = null, name: String? = null) =
+  if (name == null) website(url, title, label)
+  else cached(url, title, label, name, false)
+
+fun image(url: String, title: String? = null, label: String? = null, name: String? = null) =
+  cached(url, title, label, name, true)
