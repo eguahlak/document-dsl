@@ -26,7 +26,7 @@ class TableOfContent(
 
   override fun process() {
     if (depth > 0) list {
-      create(parent, depth)
+      create(parent, depth - 1)
       }
     }
 

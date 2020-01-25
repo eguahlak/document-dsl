@@ -14,3 +14,10 @@ fun Block.Parent.paragraph(content: String? = null, build: Paragraph.() -> Unit 
       add(paragraph)
       }
 
+fun Block.Parent.paragraph(text: Text, build: Paragraph.() -> Unit = {}) =
+    Paragraph().also {
+      it.add(text)
+      it.build()
+      add(it)
+      }
+
