@@ -41,11 +41,27 @@ class Relations {
     var number = 1
     document.children.forEach {
       when (it) {
+        is Special -> collectFrom(it, document)
         is Section -> collectFrom(it, document, 1, number++, null)
         is Listing -> collectFrom(it, document)
         is Table -> collectFrom(it, document)
         is Inline.Parent -> collectFrom(it, document)
         }
+      }
+    }
+
+  private fun collectFrom(special: Special, document: Document) {
+    when (special) {
+      is TableOfContent -> {
+        Context.targets["${document.path}/${special.label}"] = special
+        special.children.forEach {
+          when (it) {
+            is Listing -> collectFrom(it, document)
+            is Inline.Parent -> collectFrom(it, document)
+            }
+          }
+        }
+      // Future specials go here
       }
     }
 

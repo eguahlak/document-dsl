@@ -35,11 +35,13 @@ class GfmHandler(val host: Host, val configuration: Configuration, val root: Con
   private fun handle(children: List<Block.Child>, parent: Block.Parent) {
     children.forEach {
       when (it) {
+        is Special -> handle(it)
         is Section -> handle(it)
         is Paragraph -> handle(it, parent)
         is Code -> handle(it)
         is Listing -> handle(it, parent)
         is Table -> handle(it, parent)
+        is TableOfContent -> { }
         else -> TODO("Handling for new Block.Child type: $it")
         }
       }
@@ -55,8 +57,17 @@ class GfmHandler(val host: Host, val configuration: Configuration, val root: Con
   private fun handle(section: Section) = with(host) {
     val (document, level, number, prefix) = relations.sections[section]!!
     val numbering = if (configuration.hasNumbers) "$prefix " else ""
-    printLine(level of "#", "$numbering${section.title.nativeString()}" )
+    printLine(level of "#", "$numbering${evaluate(section.title)}" )
     handle(section.children, section)
+    }
+
+  private fun handle(special: Special) = with(host) {
+    when (special) {
+      is TableOfContent -> {
+        printLine("${special.level of "#"} ${evaluate(special.title)}")
+        handle(special.children, special)
+        }
+      }
     }
 
   private fun handle(paragraph: Paragraph, parent: Block.Parent) = with (host) {

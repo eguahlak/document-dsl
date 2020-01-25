@@ -6,6 +6,7 @@ val configuration = Configuration(hasTitle = true, hasNumbers = true)
 val root = "/Users/AKA/tmp/course-dsl"
 
 fun Folder.full() = document("full", "Main Page") {
+    toc(1, level = 4)
     val r1 = link("https://www.dr.dk/p1", label = "slides-01")
     val s1 = section("First section version 1.10", label = "first") {
       link("https://www.kalhauge.dk")

@@ -32,20 +32,35 @@ class Document(
     }
 
   override fun toString() = """Document($path)"""
+
+  fun postProcess() {
+    children.filterIsInstance<Special>().forEach { it.process() }
+    }
+
   }
 
 fun document(
     name: String,
     title: String? = null,
     build: Document.() -> Unit
-    ) = Document(name, null, title).also(build)
+    ) =
+  Document(name, null, title).also {
+    it.build()
+    it.postProcess()
+    }
 
 fun Folder.document(
     name: String,
     title: String? = null,
     build: Document.() -> Unit
-    ) = Document(name, this, title).also(build)
+    ) =
+  Document(name, this, title).also {
+    it.build()
+    it.postProcess()
+    }
+
 
 infix fun Document.from(other: Document) =
     if (this == other) ""
     else this.path from other.path
+
