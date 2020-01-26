@@ -162,10 +162,12 @@ class GfmHandler(val host: Host, val configuration: Configuration, val root: Con
             is Section -> {
               val (destination, level, number, prefix) = relations.sections[target]!!
               val title = evaluate(inline.title ?: target.title)
-              val pre = if (inline.title == null && configuration.hasNumbers) "$prefix " else ""
+              val pre = if (configuration.hasNumbers) "$prefix " else ""
+              val pret = if (inline.title == null) pre else ""
+              val anchor = "$pre${evaluate(target.title)}".anchorize()
               //val title = if (configuration.hasNumbers) "$prefix ${evaluate(inline.title ?: target.title)}"
               //            else evaluate(inline.title ?: target.title)
-              "[$pre$title](${(destination from source)-".md"}#${evaluate(target.title).anchorize()})"
+              "[$pret$title](${(destination from source)-".md"}#$anchor)"
               }
             is CachedResource -> {
               "${if (target.render) "!" else ""}[${evaluate(inline.title ?: target.title)}](${sourceOf(inline, target)})"
