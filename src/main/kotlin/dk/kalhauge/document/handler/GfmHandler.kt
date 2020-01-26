@@ -161,9 +161,11 @@ class GfmHandler(val host: Host, val configuration: Configuration, val root: Con
             null -> "<Illegal label: ${inline.target.label}>"
             is Section -> {
               val (destination, level, number, prefix) = relations.sections[target]!!
-              val title = if (configuration.hasNumbers) "$prefix ${evaluate(inline.title ?: target.title)}"
-                          else evaluate(inline.title ?: target.title)
-              "[$title](${(destination from source) - ".md"}#${evaluate(target.title).anchorize()})"
+              val title = evaluate(inline.title ?: target.title)
+              val pre = if (inline.title == null && configuration.hasNumbers) "$prefix " else ""
+              //val title = if (configuration.hasNumbers) "$prefix ${evaluate(inline.title ?: target.title)}"
+              //            else evaluate(inline.title ?: target.title)
+              "[$pre$title](${(destination from source)-".md"}#${evaluate(target.title).anchorize()})"
               }
             is CachedResource -> {
               "${if (target.render) "!" else ""}[${evaluate(inline.title ?: target.title)}](${sourceOf(inline, target)})"
