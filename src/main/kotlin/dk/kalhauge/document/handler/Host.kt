@@ -62,16 +62,26 @@ class ConsoleHost() : Host {
 
   }
 
-class FileHost(rootPath: String?) : Host {
+class FileHost(rootPath: String? = null) : Host {
   val properties = mutableMapOf<String, String>()
   val rootPath: String
-  val root = File(rootPath)
+  val root: File
   val outputs = stackOf<PrintWriter>()
 
   init {
-    try { properties.loadProperties(this::class, "course.properties") } catch (e: Exception) { println(e.message) }
+    try {
+      properties.loadProperties(this::class, "course.properties")
+      }
+    catch (e: Exception) {
+      println("Please create a course.properties file under main/resources")
+      println("The file should have at least an entry:")
+      println("course.root=<path to course root>")
+      throw e
+      }
     this.rootPath = rootPath ?: properties["course.root"] ?: throw RuntimeException("Could not find 'course.root' in 'course.properties'")
+    this.root = File(this.rootPath)
     }
+
   override var indent: Int = 0
     get() = field
     set(value) {

@@ -113,7 +113,8 @@ fun Folder.small() = document("week-06/info", "Sorting algorithms") {
   }
 
 fun main() {
-  val host = FileHost(root)
+//  val host = FileHost(root)
+  val host = FileHost()
   val context =
     folder("soft2020spring") {
       folder("ALG") {
