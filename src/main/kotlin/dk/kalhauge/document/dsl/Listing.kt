@@ -11,6 +11,8 @@ class Listing(val type: Type) : Block.Child, Block.Parent {
 
   override fun add(child: Block.Child?) { if (child != null) children += child }
 
+  override fun isEmpty() = children.isEmpty()
+
   }
 
 fun Block.Parent.list(type: Type = BULLETED, build: Listing.() -> Unit = {}) =

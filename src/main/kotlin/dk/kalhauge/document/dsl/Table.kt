@@ -11,6 +11,8 @@ class Table: Block.Child {
   val columns = mutableListOf<Column>()
   val rows = mutableListOf<Row>()
 
+  override fun isEmpty() = columns.isEmpty() && rows.isEmpty()
+
   fun column(title: String?, alignment: HorizontalAlignment, build: Column.() -> Unit = { }) =
       Column(this, title, alignment).also(build)
 

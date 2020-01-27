@@ -16,6 +16,7 @@ class Text(val format: Format = NORMAL) : Inline, Inline.Parent {
     NORMAL(EOT), BOLD('*'), ITALIC('/'), UNDERLINE('_'), STRIKE('~'), CODE('`')
     }
 
+  // TODO: determine if last check makes sense
   override fun isEmpty() = parts.isEmpty() || parts[0].isEmpty()
 
   override fun nativeString(builder: StringBuilder) {

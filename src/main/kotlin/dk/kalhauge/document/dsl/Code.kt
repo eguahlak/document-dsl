@@ -1,6 +1,8 @@
 package dk.kalhauge.document.dsl
 
-class Code(val text: String, val language: String = "") : Block.Child
+class Code(val text: String, val language: String = "") : Block.Child {
+  override fun isEmpty() = false
+  }
 
 fun Block.Parent.code(text: String, language: String = "") =
     Code(text.trimIndent(), language).also { add(it) }

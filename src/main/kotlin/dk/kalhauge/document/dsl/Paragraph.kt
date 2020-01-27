@@ -5,6 +5,11 @@ class Paragraph: Block.Child, Inline.Parent {
   override fun add(part: Inline) {
     parts += part
     }
+  operator fun invoke(build: Paragraph.() -> Unit) { build() }
+  operator fun plusAssign(text: Text) { add(text) }
+  operator fun plusAssign(content: String) { add(text(content)) }
+
+  override fun isEmpty() = parts.isEmpty()
   }
 
 fun Block.Parent.paragraph(content: String? = null, build: Paragraph.() -> Unit = {}) =

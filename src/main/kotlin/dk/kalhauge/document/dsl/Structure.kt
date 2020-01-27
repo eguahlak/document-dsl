@@ -34,7 +34,9 @@ interface Block {
       }
     }
 
-  interface Child: Block
+  interface Child: Block {
+    fun isEmpty(): Boolean
+    }
 
   }
 
