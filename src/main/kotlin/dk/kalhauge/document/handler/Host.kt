@@ -1,6 +1,7 @@
 package dk.kalhauge.document.handler
 
 import dk.kalhauge.util.copyTo
+import dk.kalhauge.util.loadProperties
 import dk.kalhauge.util.of
 import dk.kalhauge.util.stackOf
 import java.io.File
@@ -61,10 +62,16 @@ class ConsoleHost() : Host {
 
   }
 
-class FileHost(val rootPath: String) : Host {
+class FileHost(rootPath: String?) : Host {
+  val properties = mutableMapOf<String, String>()
+  val rootPath: String
   val root = File(rootPath)
   val outputs = stackOf<PrintWriter>()
 
+  init {
+    try { properties.loadProperties(this::class, "course.properties") } catch (e: Exception) { println(e.message) }
+    this.rootPath = rootPath ?: properties["course.root"] ?: throw RuntimeException("Could not find 'course.root' in 'course.properties'")
+    }
   override var indent: Int = 0
     get() = field
     set(value) {
