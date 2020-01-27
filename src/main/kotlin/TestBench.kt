@@ -10,6 +10,8 @@ fun Folder.full() = document("full", "Main Page") {
     val r1 = link("https://www.dr.dk/p1", label = "slides-01")
     val s1 = section("First section version 1.10", label = "first") {
       link("https://www.kalhauge.dk")
+      val p1 = paragraph("P1")
+      p1 += "Hello"
       paragraph {
         text("A *tex*t")
         text("And one more", Text.Format.UNDERLINE)
@@ -17,6 +19,7 @@ fun Folder.full() = document("full", "Main Page") {
         reference(r1)
         reference("../week-06/info/top", "Go to week 6")
         }
+
       paragraph {
         image("/Users/AKA/Pictures/Michellaneous/raven.png", name = "raven.png")
         image("$root/images/raven.png", name = "raven.png")

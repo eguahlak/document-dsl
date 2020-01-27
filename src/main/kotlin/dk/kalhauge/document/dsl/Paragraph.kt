@@ -7,7 +7,7 @@ class Paragraph: Block.Child, Inline.Parent {
     }
   operator fun invoke(build: Paragraph.() -> Unit) { build() }
   operator fun plusAssign(text: Text) { add(text) }
-  operator fun plusAssign(content: String) { add(text(content)) }
+  operator fun plusAssign(content: String) { text(content) }
 
   override fun isEmpty() = parts.isEmpty()
   }
