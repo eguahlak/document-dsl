@@ -4,8 +4,8 @@ import dk.kalhauge.document.dsl.*
 import dk.kalhauge.document.dsl.Text.Format.*
 import dk.kalhauge.util.*
 
-class GfmHandler(val host: Host, val configuration: Configuration, val root: Context) {
-  val relations = Relations()
+class GfmHandler(val host: Host, val root: Context) {
+  private val relations = Relations()
 
   fun handle(printTargets: Boolean = false, printRelations: Boolean = false) {
     relations.collectFrom(root)
@@ -162,7 +162,7 @@ class GfmHandler(val host: Host, val configuration: Configuration, val root: Con
             is Section -> {
               val (destination, level, number, prefix) = relations.sections[target]!!
               val title = if (inline.title != null) evaluate(inline.title)
-                          else if (configuration.hasNumbers) "$prefix ${evaluate(target.title)}"
+                          else if (host.configuration.hasNumbers) "$prefix ${evaluate(target.title)}"
                           else evaluate(target.title)
               "[$title](${(destination from source)-".md"}#${evaluate(target.title).anchorize()})"
               }

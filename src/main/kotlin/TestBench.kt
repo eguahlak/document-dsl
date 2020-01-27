@@ -2,8 +2,8 @@ import dk.kalhauge.document.dsl.*
 import dk.kalhauge.document.handler.FileHost
 import dk.kalhauge.document.handler.GfmHandler
 
-val configuration = Configuration(hasTitle = true, hasNumbers = true)
-val root = "/Users/AKA/tmp/course-dsl"
+val conf = Configuration(hasTitle = true, hasNumbers = true)
+val imageRoot = conf["image.root"]
 
 fun Folder.full() = document("full", "Main Page") {
     toc(1, level = 4)
@@ -22,7 +22,7 @@ fun Folder.full() = document("full", "Main Page") {
 
       paragraph {
         image("/Users/AKA/Pictures/Michellaneous/raven.png", name = "raven.png")
-        image("$root/images/raven.png", name = "raven.png")
+        image("$imageRoot/raven.png", name = "raven.png")
         image("http://www.kalhauge.dk/Mathias/mig_selv.png", name = "migselv.png")
         }
       paragraph("another text")
@@ -114,7 +114,7 @@ fun Folder.small() = document("week-06/info", "Sorting algorithms") {
 
 fun main() {
 //  val host = FileHost(root)
-  val host = FileHost()
+  val host = FileHost(conf)
   val context =
     folder("soft2020spring") {
       folder("ALG") {
@@ -123,6 +123,6 @@ fun main() {
         val doc2 = small()
         }
       }
-  GfmHandler(host, configuration, context).handle(true, true)
+  GfmHandler(host, context).handle(true, true)
   // Folder.targets.forEach { (label, target) -> println("$label --> $target") }
   }

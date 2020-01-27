@@ -1,7 +1,7 @@
 package dk.kalhauge.document.handler
 
+import dk.kalhauge.document.dsl.Configuration
 import dk.kalhauge.util.copyTo
-import dk.kalhauge.util.loadProperties
 import dk.kalhauge.util.of
 import dk.kalhauge.util.stackOf
 import java.io.File
@@ -9,6 +9,7 @@ import java.io.PrintWriter
 import java.net.URL
 
 interface Host {
+  val configuration: Configuration
   var indent: Int
   fun print(text: String?)
   fun printLine(text: String?, emptyLineCount: Int = 1)
@@ -22,7 +23,7 @@ interface Host {
   fun downloadFile(url: String, targetPath: String)
   }
 
-class ConsoleHost() : Host {
+class ConsoleHost(override val configuration: Configuration) : Host {
   val filenames = stackOf<String>()
 
   override var indent: Int = 0
@@ -62,25 +63,10 @@ class ConsoleHost() : Host {
 
   }
 
-class FileHost(rootPath: String? = null) : Host {
-  val properties = mutableMapOf<String, String>()
-  val rootPath: String
-  val root: File
+class FileHost(override val configuration: Configuration) : Host {
+  val courseRoot get() = configuration.courseRoot
+  val root: File get() = configuration.root
   val outputs = stackOf<PrintWriter>()
-
-  init {
-    try {
-      properties.loadProperties(this::class, "course.properties")
-      }
-    catch (e: Exception) {
-      println("Please create a course.properties file under main/resources")
-      println("The file should have at least an entry:")
-      println("course.root=<path to course root>")
-      throw e
-      }
-    this.rootPath = rootPath ?: properties["course.root"] ?: throw RuntimeException("Could not find 'course.root' in 'course.properties'")
-    this.root = File(this.rootPath)
-    }
 
   override var indent: Int = 0
     get() = field
@@ -88,10 +74,6 @@ class FileHost(rootPath: String? = null) : Host {
       field = value
       if (field < 0) throw IllegalArgumentException("Indent can't be negative")
       }
-  init {
-    // root should be a directory and should exist
-    if (!root.isDirectory) throw IllegalArgumentException("$rootPath should point to existing directory")
-    }
 
   override fun print(text: String?) {
     if (text == null) return
@@ -108,7 +90,7 @@ class FileHost(rootPath: String? = null) : Host {
     }
 
   override fun open(filename: String) {
-    val file = File(rootPath, filename)
+    val file = File(courseRoot, filename)
     val parent = file.parentFile
     parent.mkdirs()
     file.delete()
@@ -123,7 +105,7 @@ class FileHost(rootPath: String? = null) : Host {
   override fun updateFile(sourcePath: String, targetPath: String) {
     print("updating $sourcePath to $targetPath ")
     val source = File(sourcePath)
-    val target = File(rootPath, targetPath)
+    val target = File(courseRoot, targetPath)
     if (!source.exists()) {
       println("$sourcePath doesn't exist on this machine")
       }
@@ -139,7 +121,7 @@ class FileHost(rootPath: String? = null) : Host {
   override fun downloadFile(url: String, targetPath: String) {
     print("downloading $url to $targetPath ")
     val source = URL(url)
-    val target = File(rootPath, targetPath)
+    val target = File(courseRoot, targetPath)
     if (!target.exists()) {
       source.copyTo(target)
       println("done!")
