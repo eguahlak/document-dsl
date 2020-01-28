@@ -23,8 +23,8 @@ class Folder(
     }
   }
 
-fun folder(name: String, build: Folder.() -> Unit) =
-    Folder(name, null).also(build)
+fun folder(name: String, from: Folder? = null, build: Folder.() -> Unit) =
+    Folder(name, from).also(build)
 
 fun Folder.folder(name: String, build: Folder.() -> Unit) =
     Folder(name, this).also(build)
