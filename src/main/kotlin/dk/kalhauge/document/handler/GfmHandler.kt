@@ -126,7 +126,7 @@ class GfmHandler(val host: Host, val root: Context) {
         BOLD -> "**$this**"
         ITALIC -> "_${this}_"
         UNDERLINE -> "<u>$this</u>"
-        STRIKE -> "~$this~"
+        STRIKE -> "~~$this~~"
         CODE -> "`$this`"
         }
 
@@ -146,12 +146,18 @@ class GfmHandler(val host: Host, val root: Context) {
       else -> resource.source.url
       }
 
+  fun emptyOf(format: Text.Format) = when (format) {
+    ITALIC -> "/"
+    STRIKE -> "~"
+    else -> """\${format.delimiter}"""
+    }
+
   fun evaluate(inline: Inline?): String =
       when (inline) {
         null -> ""
         is Content -> inline.value
         is Text ->
-            if (inline.isEmpty()) """\${inline.format.delimiter}"""
+            if (inline.isEmpty()) emptyOf(inline.format)
             else inline.parts.joinToString("") { evaluate(it) } with inline.format
         is Reference -> {
           // val (source) = relations.references[inline] ?: throw IllegalStructure("No relations to: $inline")
