@@ -64,7 +64,7 @@ class ConsoleHost(override val configuration: Configuration) : Host {
   }
 
 class FileHost(override val configuration: Configuration) : Host {
-  val courseRoot get() = configuration.courseRoot
+  val courseRoot get() = configuration.contextRoot
   val root: File get() = configuration.root
   val outputs = stackOf<PrintWriter>()
 

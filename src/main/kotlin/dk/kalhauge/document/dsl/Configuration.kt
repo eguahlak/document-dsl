@@ -8,27 +8,33 @@ class Configuration(
     val hasNumbers: Boolean = false
     ) {
   val properties = mutableMapOf<String, String>()
-  val courseRoot: String
+  val contextRoot: String
   val root: File
 
   init {
     try {
-      loadProperties("course.properties")
+      loadProperties("context.properties")
       }
     catch (e: Exception) {
-      println("Please create a course.properties file under main/resources")
+      println("Please create a context.properties file under main/resources")
       println("The file should have at least an entry:")
-      println("course.root=<path to course root>")
+      println("context.root=<path to context root>")
+      println("Trying with default values")
       throw e
       }
-    this.courseRoot = courseRoot ?: properties["course.root"] ?: throw RuntimeException("Could not find 'course.root' in 'course.properties'")
-    this.root = File(this.courseRoot)
+    this.contextRoot = courseRoot
+        ?: properties["context.root"]
+        ?: this::class.java.classLoader.getResource(".").path.substringBeforeLast("/dsl/build")
+    this.root = File(this.contextRoot)
     }
 
   operator fun get(key: String) =
     when (key) {
-      "course.root" -> courseRoot
-      else -> properties[key] ?: throw RuntimeException("Could not find '$key' in 'course.properties'")
+      "context.root" -> contextRoot
+      else -> properties[key] ?: {
+        println("Using the empty string for $key, consider adding an entry in context.properties")
+        ""
+        }()
       }
 
   fun loadProperties(name: String) {
