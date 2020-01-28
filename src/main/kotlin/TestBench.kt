@@ -119,8 +119,8 @@ fun main() {
     folder("soft2020spring") {
       folder("ALG") {
         //resources = "cache"
-        val doc1 = full()
-        val doc2 = small()
+        full()
+        small()
         }
       }
   GfmHandler(host, context).handle(true, true)

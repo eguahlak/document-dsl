@@ -40,7 +40,7 @@ class GfmHandler(val host: Host, val root: Context) {
         is Paragraph -> handle(it, parent)
         is Code -> handle(it)
         is Listing -> handle(it, parent)
-        is Table -> handle(it, parent)
+        is Table -> handle(it)
         is TableOfContent -> { }
         else -> TODO("Handling for new Block.Child type: $it")
         }
@@ -55,7 +55,7 @@ class GfmHandler(val host: Host, val root: Context) {
     }
 
   private fun handle(section: Section) = with(host) {
-    val (document, level, number, prefix) = relations.sections[section]!!
+    val (_, level, _, prefix) = relations.sections[section]!!
     val numbering = if (configuration.hasNumbers) "$prefix " else ""
     printLine(level of "#", "$numbering${evaluate(section.title)}" )
     handle(section.children, section)
@@ -103,7 +103,7 @@ class GfmHandler(val host: Host, val root: Context) {
       }
     }
 
-  fun handle(table: Table, parent: Block.Parent) = with (host) {
+  fun handle(table: Table) = with (host) {
     printLine(table.columns.joinToString(" | ", "| ", " |") { evaluate(it.title) }, 0)
     printLine(table.columns.joinToString(" | ", "| ", " |") { evaluate(it.alignment) }, 0)
     table.rows.forEach { row ->
@@ -158,13 +158,16 @@ class GfmHandler(val host: Host, val root: Context) {
           val source = inline.document
           //val fullLabel = normalizePath("${source.path}/${inline.label}")
           when (val target = inline.target.fixFrom(source)) { // TODO Check
-            null -> "<Illegal label: ${inline.target.label}>"
             is Section -> {
-              val (destination, level, number, prefix) = relations.sections[target]!!
-              val title = if (inline.title != null) evaluate(inline.title)
-                          else if (host.configuration.hasNumbers) "$prefix ${evaluate(target.title)}"
-                          else evaluate(target.title)
-              "[$title](${(destination from source)-".md"}#${evaluate(target.title).anchorize()})"
+              val (destination, _, _, prefix) = relations.sections[target]!!
+              val title =
+                  if (inline.title != null) evaluate(inline.title)
+                  else if (host.configuration.hasNumbers) "$prefix ${evaluate(target.title)}"
+                  else evaluate(target.title)
+              val url =
+                  if (host.configuration.hasNumbers) "$prefix ${evaluate(target.title)}"
+                  else evaluate(target.title)
+              "[$title](${(destination from source)-".md"}#${url.anchorize()})"
               }
             is CachedResource -> {
               "${if (target.render) "!" else ""}[${evaluate(inline.title ?: target.title)}](${sourceOf(inline, target)})"
