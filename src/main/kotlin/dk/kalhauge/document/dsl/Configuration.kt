@@ -16,11 +16,10 @@ class Configuration(
       loadProperties("context.properties")
       }
     catch (e: Exception) {
-      println("Please create a context.properties file under main/resources")
-      println("The file should have at least an entry:")
-      println("context.root=<path to context root>")
-      println("Trying with default values")
-      throw e
+      System.err.println("Please create a context.properties file under main/resources")
+      System.err.println("The file should have at least an entry:")
+      System.err.println("context.root=<path to context root>")
+      System.err.println("Trying with default values ...")
       }
     this.contextRoot = courseRoot
         ?: properties["context.root"]
