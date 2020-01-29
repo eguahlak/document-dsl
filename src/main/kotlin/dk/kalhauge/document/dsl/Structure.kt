@@ -13,7 +13,9 @@ interface Context {
       if (target == null) {
         println("Trying to find: $label")
         println("Searching...")
-        targets.filter { it.key.endsWith(label) }.forEach { (k, v) -> println("$k --> $v") }
+        val chances = targets.filter { label.endsWith("/${it.key}") }.values
+        if (chances.size == 1) return chances.first()
+        println("... too many choices: $chances")
         throw IllegalStructure("Cant find target")
         }
       else return target
