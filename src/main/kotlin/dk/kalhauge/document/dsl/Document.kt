@@ -72,7 +72,7 @@ class RawDocument(
     ) : Context {
   val content: String
   init {
-    this.content = content.replace("\\{\\{(.*)\\}\\}".toRegex()) { match ->
+    this.content = content.replace("\\{\\{([^{}]*)\\}\\}".toRegex()) { match ->
       val result = variables[match.groupValues[1]] ?: "{{${match.groupValues[1]}?}}"
       result.toString()
       }

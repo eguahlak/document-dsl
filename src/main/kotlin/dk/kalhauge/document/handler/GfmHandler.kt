@@ -164,16 +164,18 @@ class GfmHandler(val host: Host, val root: Context) {
       when (inline) {
         null -> ""
         is Content -> {
-          inline.value.replace("\\{\\{(.*)\\}\\}".toRegex()) { match ->
-            val label = match.groupValues[1]
+          inline.value.replace("\\{\\{([^{}]*:)?([^{}]*)\\}\\}".toRegex()) { match ->
+            val pre = match.groupValues[1]
+            val title = if (pre.isEmpty()) null else pre.substringBefore(":")
+            val label = match.groupValues[2]
             when (val target = Context[label]) {
               is CachedResource -> {
-                "${if (target.render) "!" else ""}[${evaluate(target.title)}](${target.source.url})"
+                "${if (target.render) "!" else ""}[${title ?: evaluate(target.title)}](${target.source.url})"
                 }
               is Resource -> {
-                "[${evaluate(target.title)}](${target.source.url})"
+                "[${title ?: evaluate(target.title)}](${target.source.url})"
                 }
-              else -> "<<Unknown label: $label>>"
+              else -> "<<Cannot inline: $target>>"
               }
             }
           }

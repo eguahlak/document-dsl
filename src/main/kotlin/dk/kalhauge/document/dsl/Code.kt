@@ -19,3 +19,5 @@ fun Block.Parent.javascript(text: String) =
 fun Block.Parent.elm(text: String) =
     code(text, "elm")
 
+fun Block.Parent.bash(text: String) =
+    code(text, "bash")

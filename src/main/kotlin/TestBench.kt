@@ -15,7 +15,7 @@ fun Folder.full() = document("full", "Main Page") {
       paragraph {
         text("A *tex*t")
         text("And one more", Text.Format.UNDERLINE)
-        link("https://kotlin-lang.org", title = "Kotlin homepage")
+        link("https://kotlin-lang.org", title = "Kotlin homepage", label = "KOTLIN")
         reference(r1)
         reference("../week-06/info/top", "Go to week 6")
         }
@@ -43,7 +43,7 @@ fun Folder.full() = document("full", "Main Page") {
         paragraph("Third")
         list(Listing.Type.ARABIC) {
           //section("In a list?") {
-            paragraph("some content with {{slides-01}}")
+            paragraph("some content with {{P1:slides-01}} and {{KOTLIN}}")
           //}
           paragraph("Uno")
           paragraph("Due")
@@ -113,7 +113,6 @@ fun Folder.small() = document("week-06/info", "Sorting algorithms") {
   }
 
 fun main() {
-//  val host = FileHost(root)
   val host = FileHost(conf)
   val context =
     folder("soft2020spring") {
