@@ -43,7 +43,7 @@ fun Folder.full() = document("full", "Main Page") {
         paragraph("Third")
         list(Listing.Type.ARABIC) {
           //section("In a list?") {
-            paragraph("some content")
+            paragraph("some content with {{slides-01}}")
           //}
           paragraph("Uno")
           paragraph("Due")

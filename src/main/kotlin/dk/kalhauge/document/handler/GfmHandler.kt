@@ -163,7 +163,20 @@ class GfmHandler(val host: Host, val root: Context) {
   fun evaluate(inline: Inline?): String =
       when (inline) {
         null -> ""
-        is Content -> inline.value
+        is Content -> {
+          inline.value.replace("\\{\\{(.*)\\}\\}".toRegex()) { match ->
+            val label = match.groupValues[1]
+            when (val target = Context[label]) {
+              is CachedResource -> {
+                "${if (target.render) "!" else ""}[${evaluate(target.title)}](${target.source.url})"
+                }
+              is Resource -> {
+                "[${evaluate(target.title)}](${target.source.url})"
+                }
+              else -> "<<Unknown label: $label>>"
+              }
+            }
+          }
         is Text ->
             if (inline.isEmpty()) emptyOf(inline.format)
             else inline.parts.joinToString("") { evaluate(it) } with inline.format
@@ -210,4 +223,4 @@ class GfmHandler(val host: Host, val root: Context) {
         HorizontalAlignment.JUSTIFY -> "-----"
       }
 
-}
+  }

@@ -1,6 +1,7 @@
 package dk.kalhauge.document.dsl
 
 import dk.kalhauge.util.toMD5
+import dk.kalhauge.document.dsl.Target
 
 sealed class Address {
   abstract val label: String
@@ -43,8 +44,8 @@ open class Resource(
   init {
     if (title == null) this.title = code(source.title)
     else this.title = text(title)
-    if (label == null) this.label = "res:${source.label}"
-    else this.label = label
+    this.label = label ?: "res:${source.label}"
+    Context.targets[this.label] = this
     }
 
   override fun nativeString(builder: StringBuilder) {
