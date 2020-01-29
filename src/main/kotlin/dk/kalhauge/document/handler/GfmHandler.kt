@@ -18,6 +18,7 @@ class GfmHandler(val host: Host, val root: Context) {
     when (root) {
       is Folder ->  handle(root)
       is Document -> handle(root)
+      is RawDocument -> handle(root)
       else -> TODO("Handling for new context type: $root")
       }
     }
@@ -28,6 +29,7 @@ class GfmHandler(val host: Host, val root: Context) {
       when (it) {
         is Folder -> handle(it)
         is Document -> handle(it)
+        is RawDocument -> handle(it)
         }
       }
     }
@@ -51,6 +53,12 @@ class GfmHandler(val host: Host, val root: Context) {
     open("${document.path}.md")
     if (configuration.hasTitle) printLine("# **${evaluate(document.title)}**")
     handle(document.children, document)
+    close()
+    }
+
+  private fun handle(file: RawDocument) = with(host) {
+    open("${file.path}")
+    printLine(file.content, 0)
     close()
     }
 

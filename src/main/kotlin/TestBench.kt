@@ -117,6 +117,7 @@ fun main() {
   val host = FileHost(conf)
   val context =
     folder("soft2020spring") {
+      file("notes.txt", """Hello the {{name}} how are you?""", mapOf("name" to "Kurt Hansen"))
       folder("ALG") {
         //resources = "cache"
         full()

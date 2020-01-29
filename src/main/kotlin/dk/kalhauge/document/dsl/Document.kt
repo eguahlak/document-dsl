@@ -64,3 +64,28 @@ infix fun Document.from(other: Document) =
     if (this == other) ""
     else this.path from other.path
 
+class RawDocument(
+    override val trunk: Context,
+    override val name: String,
+    content: String,
+    val variables: Map<String, Any>
+    ) : Context {
+  val content: String
+  init {
+    this.content = content.replace("\\{\\{(.*)\\}\\}".toRegex()) { match ->
+      val result = variables[match.groupValues[1]] ?: "{{${match.groupValues[1]}?}}"
+      result.toString()
+      }
+    trunk.add(this)
+    }
+  override val branches = emptyList<Context>()
+  override var resources
+    get() = trunk.resources
+    set(value) { trunk.resources = value }
+  override fun add(branch: Context) {
+    throw IllegalStructure("No branches can be added to documents")
+    }
+  }
+
+fun Folder.file(name: String, content: String, variables: Map<String, Any> = emptyMap()) =
+  RawDocument(this, name, content, variables)
