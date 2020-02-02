@@ -51,9 +51,3 @@ fun normalize(path: String, name: String? = null): String {
   }
 
 operator fun String.minus(postfix: String) = if (this.isNotBlank()) "$this$postfix" else ""
-
-
-fun main() {
-
-
-  }

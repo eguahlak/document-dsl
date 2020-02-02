@@ -9,12 +9,3 @@ fun URL.copyTo(target: File, skip: (File) -> Boolean = { false }) {
     this.openConnection().getInputStream().use { input -> input.copyTo(output) }
     }
   }
-
-
-fun main() {
-  val file = File("/Users/AKA/tmp/resources/raven.png")
-  println(file.absolutePath.toMD5())
-  println("/Users/AKA/tmp/resources/raven.png".toMD5())
-  println("/Users/AKA/tmp/resourCes/raven.png".toMD5())
-
-  }

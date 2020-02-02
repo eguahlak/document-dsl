@@ -26,13 +26,6 @@ class Text(context: Context?, val format: Format = NORMAL) : Inline.BaseContaine
     if (format != NORMAL) builder.append(format.delimiter)
     }
 
-  /*
-  override fun process() = true
-  override fun collectTo(targets: MutableMap<String, Target>) {
-    parts.forEach { it.collectTo(targets) }
-    }
-  */
-
   private fun consume(chars: CharIterator, builder: StringBuilder): Char {
     while(chars.hasNext()) {
       val next = chars.next()
@@ -133,10 +126,3 @@ fun Text.underline(content: String? = null, build: Text.() -> Unit = {}) = text(
 fun Text.strike(content: String? = null, build: Text.() -> Unit = {}) = text(content, STRIKE, build)
 
 fun String.toText() = text(this)
-
-fun main() {
-  println("title:label".substringBefore(':', ""))
-  println("title:label".substringAfter(':'))
-  println("label".substringBefore(':', ""))
-  println("label".substringAfter(':'))
-  }

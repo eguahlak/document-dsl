@@ -1,5 +1,8 @@
 package dk.kalhauge.document.dsl.structure
 
+import dk.kalhauge.document.dsl.paragraph
+import dk.kalhauge.document.dsl.text
+
 interface Block {
 
   interface Parent: Block {
@@ -14,6 +17,10 @@ interface Block {
       children += child
       child.context = this
       }
+    operator fun String.unaryPlus() {
+      val content = this
+      paragraph { text(content) }
+      }
     }
 
   interface Child: Block {
@@ -23,9 +30,3 @@ interface Block {
 
   }
 
-/*
-    operator fun String.unaryPlus() {
-      val content = this
-      paragraph { text(content) }
-      }
-*/
