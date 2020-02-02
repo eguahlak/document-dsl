@@ -1,91 +1,61 @@
 package dk.kalhauge.document.dsl
 
-import dk.kalhauge.util.from
-
+import dk.kalhauge.document.dsl.structure.Block
+import dk.kalhauge.document.dsl.structure.Tree
 
 class Document(
+    override val trunk: Tree.Trunk,
     override val name: String,
-    override val trunk: Context?,
-    title: String?
-    ): Block.Parent, Context, Target {
-  override val label = "top"
-  override val branches = emptyList<Context>()
-  override val children = mutableListOf<Block.Child>()
-  var title = text(title)
-  private var resourcePath: String? = null
-  override var resources: String
-    get() = trunk?.resources ?: "$name/${resourcePath?:"resources"}"
-    set(value) {
-      if (trunk == null) resourcePath = value
-      else trunk.resources = "$name/$value"
-      }
+    title: String?,
+    label: String?
+    ) : Block.BaseParent(), Tree.Branch, Target {
+  val label = label ?: name
 
-  override fun add(child: Block.Child?) { if (child != null) children += child }
+  override val keyPath = "${trunk.path}/${this.label}"
+  override val filePath = "${trunk.path}/$name"
+  //override val filePath = trunk.path
+  override val key = keyPath
+  override val path = filePath
+  override fun register(target: Target) = root.register(target)
+  override fun find(key: String) = root.find(key)
 
-  override fun add(branch: Context) {
-    throw IllegalStructure("No branches can be added to documents")
-    }
+  override var title = text(title)
+  override val root = trunk.root
 
   init {
-    if (trunk == null) Context.root = this
-    else trunk.add(this)
+    register()
     }
 
-  override fun toString() = """Document($path)"""
-
-  fun postProcess() {
-    children.filterIsInstance<Special>().forEach { it.process() }
+  override fun register() {
+    this.root.register(this)
     }
+  override fun toString() = "{/Document $name/:$path}"
 
   }
 
-fun document(
+fun Tree.Trunk.document(
     name: String,
     title: String? = null,
+    label: String? = null,
     build: Document.() -> Unit
     ) =
-  Document(name, null, title).also {
+  Document(this, name, title, label).also {
     it.build()
-    it.postProcess()
+    add(it)
     }
 
-fun Folder.document(
-    name: String,
-    title: String? = null,
-    build: Document.() -> Unit
-    ) =
-  Document(name, this, title).also {
-    it.build()
-    it.postProcess()
-    }
-
-
-infix fun Document.from(other: Document) =
-    if (this == other) ""
-    else this.path from other.path
-
-class RawDocument(
-    override val trunk: Context,
+class FileDocument(
+    override val trunk: Tree.Trunk,
     override val name: String,
     content: String,
-    val variables: Map<String, Any>
-    ) : Context {
-  val content: String
-  init {
-    this.content = content.replace("\\{\\{([^{}]*)\\}\\}".toRegex()) { match ->
+    private val variables: Map<String, Any>
+    ) : Tree.Branch {
+  val content =
+    content.replace("\\{\\{([^{}]*)}}".toRegex()) { match ->
       val result = variables[match.groupValues[1]] ?: "{{${match.groupValues[1]}?}}"
       result.toString()
       }
-    trunk.add(this)
-    }
-  override val branches = emptyList<Context>()
-  override var resources
-    get() = trunk.resources
-    set(value) { trunk.resources = value }
-  override fun add(branch: Context) {
-    throw IllegalStructure("No branches can be added to documents")
-    }
   }
 
-fun Folder.file(name: String, content: String, variables: Map<String, Any> = emptyMap()) =
-  RawDocument(this, name, content, variables)
+fun Tree.Trunk.file(name: String, content: String, variables: Map<String, Any> = emptyMap()) =
+  FileDocument(this, name, content, variables).also { add(it) }

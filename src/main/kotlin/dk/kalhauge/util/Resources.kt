@@ -2,7 +2,6 @@ package dk.kalhauge.util
 
 import java.io.File
 import java.net.URL
-import kotlin.reflect.KClass
 
 fun URL.copyTo(target: File, skip: (File) -> Boolean = { false }) {
   if (skip(target)) return

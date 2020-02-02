@@ -1,6 +1,6 @@
 package dk.kalhauge.util
 
-import java.lang.Math.abs
+import kotlin.math.*
 
 fun String.anchorize() = toLowerCase().replace("[^a-z0-9]+".toRegex(), "-")
 

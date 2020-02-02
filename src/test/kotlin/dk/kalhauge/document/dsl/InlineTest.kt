@@ -35,7 +35,7 @@ class InlineTest {
   @Test
   fun testContentWithItalic() {
     val content = "This is a text it is /italic/"
-    val text = Text()
+    val text = Text(null)
     text.readContent(content.iterator())
     assertTrue(text.parts[0] is Content)
     assertTrue((text.parts[0] as Content).value == "This is a text it is ")
@@ -47,7 +47,7 @@ class InlineTest {
   @Test
   fun testNestedContent() {
     val content = "This is a *bold* and an /italic text width _underlined_ / passages"
-    val text = Text()
+    val text = Text(null)
     text.readContent(content.iterator())
     assertEquals(content, text.nativeString())
     }

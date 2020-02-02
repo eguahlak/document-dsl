@@ -1,23 +1,28 @@
 package dk.kalhauge.document.dsl
 
-class Code(val text: String, val language: String = "") : Block.Child {
+import dk.kalhauge.document.dsl.structure.Block
+import dk.kalhauge.document.dsl.structure.Context
+import dk.kalhauge.document.dsl.structure.FreeContext
+
+class Code(context: Context?, val text: String, val language: String = "") : Block.Child {
+  override var context = context ?: FreeContext
   override fun isEmpty() = false
   }
 
-fun Block.Parent.code(text: String, language: String = "") =
-    Code(text.trimIndent(), language).also { add(it) }
+fun Block.BaseParent.code(text: String, language: String = "") =
+    Code(this, text.trimIndent(), language).also { add(it) }
 
-fun Block.Parent.kotlin(text: String) =
+fun Block.BaseParent.kotlin(text: String) =
     code(text, "kotlin")
 
-fun Block.Parent.java(text: String) =
+fun Block.BaseParent.java(text: String) =
     code(text, "java")
 
-fun Block.Parent.javascript(text: String) =
+fun Block.BaseParent.javascript(text: String) =
     code(text, "javascript")
 
-fun Block.Parent.elm(text: String) =
+fun Block.BaseParent.elm(text: String) =
     code(text, "elm")
 
-fun Block.Parent.bash(text: String) =
+fun Block.BaseParent.bash(text: String) =
     code(text, "bash")

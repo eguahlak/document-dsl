@@ -1,15 +1,40 @@
 package dk.kalhauge.document.dsl
 
+import dk.kalhauge.document.dsl.structure.Block
+import dk.kalhauge.document.dsl.structure.Context
+import dk.kalhauge.document.dsl.structure.FreeContext
+import dk.kalhauge.document.dsl.structure.Prefixed
 import dk.kalhauge.util.anchorize
+import dk.kalhauge.util.normalize
 
-open class Section(title: String, label: String? = null): Block.Child, Block.Parent, Target {
-  var title = text(title)
-  override val label = "sec:${label ?: title.anchorize()}"
-  override val children = mutableListOf<Block.Child>()
+class Section(
+    context: Context?,
+    title: String,
+    label: String? = null,
+    level: Int? = null
+    ) : Block.BaseParent(), Block.Child, Target, Prefixed {
+  override var context = context ?: FreeContext
+  override var title = text(title)
+  val label = label ?: "sec=${title.anchorize()}"
+  override val key get() = normalize("${context.keyPath}/$label")
+  override val filePath get() = context.filePath
+  override val keyPath get() = context.keyPath
+  override fun register(target: Target) = context.register(target)
+  override fun find(key: String) = context.find(key)
 
-  override fun add(child: Block.Child? ) { if (child != null && !child.isEmpty()) children += child }
+  val number get() = context.let { if (it is Block.Parent) it.numberOf(this) + 1 else 1 }
+  override val prefix get() = context.let { if (it is Section) "${it.number}.$number " else "$number " }
+  private val forcedLevel = level
+  val level: Int get() = forcedLevel ?: context.let { if (it is Section) it.level + 1 else 1}
 
-  override fun toString() = """Section("$title"/$label)"""
+  init {
+    register()
+    }
+
+  override fun register() {
+    this.context.register(this)
+    }
+  override fun toString() = "{/Section $title/:$label}"
 
   override fun isEmpty() = children.isEmpty() && title.isEmpty()
 
@@ -17,12 +42,19 @@ open class Section(title: String, label: String? = null): Block.Child, Block.Par
   operator fun plusAssign(text: Text) { paragraph { add(text) }}
   operator fun plusAssign(content: String) { plusAssign(text(content)) }
 
-  data class Relation(val document: Document, val level: Int, val number: Int, val prefix: String)
   }
 
-fun Block.Parent.section(title: String, label: String? = null, build: Section.() -> Unit = {}) =
-    Section(title, label ?: title.anchorize()).also {
+fun Block.BaseParent.section(title: String, label: String? = null, hashes: Int? = null, build: Section.() -> Unit = {}) =
+    Section(this, title, label, hashes).also {
       it.build()
       add(it)
       }
+
+fun section(title: String, label: String? = null, hashes: Int? = null, build: Section.() -> Unit = {}) =
+    Section(null, title, label, hashes).also {
+      it.build()
+      }
+
+fun Block.Parent.numberOf(section: Section) =
+    children.filterIsInstance<Section>().indexOf(section)
 

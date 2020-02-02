@@ -2,12 +2,16 @@ package dk.kalhauge.document.dsl
 
 import dk.kalhauge.document.dsl.HorizontalAlignment.*
 import dk.kalhauge.document.dsl.VerticalAlignment.*
+import dk.kalhauge.document.dsl.structure.Block
+import dk.kalhauge.document.dsl.structure.Context
+import dk.kalhauge.document.dsl.structure.FreeContext
 
 enum class HorizontalAlignment { LEFT, CENTER, RIGHT, JUSTIFY }
 
 enum class VerticalAlignment { TOP, MIDDLE, BOTTOM }
 
-class Table: Block.Child {
+class Table(context: Context?): Block.Child {
+  override var context = context ?: FreeContext
   val columns = mutableListOf<Column>()
   val rows = mutableListOf<Row>()
 
@@ -29,31 +33,35 @@ class Table: Block.Child {
       column(title, JUSTIFY, build)
 
   fun row(alignment: VerticalAlignment = TOP, build: Row.() -> Unit = {}) =
-      Row(this, alignment).also(build)
+    Row(this, alignment).also(build)
 
   class Column(val table: Table, title: String?, val alignment: HorizontalAlignment) {
-    var index = table.columns.size
+    val index = table.columns.size
     var title = text(title)
 
     init { table.columns += this }
 
     }
 
-  class Row(val table: Table, val alignment: VerticalAlignment) : Block.Parent {
+  class Row(val table: Table, val alignment: VerticalAlignment) : Block.BaseParent() {
+    override val filePath get() = table.context.filePath
+    override val keyPath get() = table.context.keyPath
+    override fun register(target: Target) = table.context.register(target)
+    override fun find(key: String) = table.context.find(key)
+
     val index = table.rows.size
-    override val children = mutableListOf<Block.Child>()
 
     init { table.rows += this }
-
-    override fun add(child: Block.Child?) { if (child != null) children += child }
-
 
     }
 
   }
 
-fun Block.Parent.table(build: Table.() -> Unit = { }) =
-    Table().also {
-      it.build()
-      add(it)
-      }
+fun Block.BaseParent.table(build: Table.() -> Unit = { }) =
+  Table(this).also {
+    it.build()
+    add(it)
+    }
+
+fun table(build: Table.() -> Unit = { }) =
+  Table(null).also(build)

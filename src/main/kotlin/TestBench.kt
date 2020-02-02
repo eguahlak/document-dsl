@@ -1,4 +1,5 @@
 import dk.kalhauge.document.dsl.*
+import dk.kalhauge.document.dsl.structure.root
 import dk.kalhauge.document.handler.FileHost
 import dk.kalhauge.document.handler.GfmHandler
 
@@ -6,24 +7,24 @@ val conf = Configuration(hasTitle = true, hasNumbers = true)
 val imageRoot = conf["image.root"]
 
 fun Folder.full() = document("full", "Main Page") {
-    toc(1, level = 4)
-    val r1 = link("https://www.dr.dk/p1", label = "slides-01")
+    toc()
+    val r1 = link(Address.Web("https://www.dr.dk/p1"), label = "/slides-01")
     val s1 = section("First section version 1.10", label = "first") {
-      link("https://www.kalhauge.dk")
+      link(Address.Web("https://www.kalhauge.dk"))
       val p1 = paragraph("P1")
       p1 += "Hello"
       paragraph {
         text("A *tex*t")
         text("And one more", Text.Format.UNDERLINE)
-        link("https://kotlin-lang.org", title = "Kotlin homepage", label = "KOTLIN")
+        link(Address.Web("https://kotlin-lang.org"), title = "Kotlin homepage", label = "/KOTLIN")
         reference(r1)
-        reference("../week-06/info/top", "Go to week 6")
+        reference("../week-06/info", "Go to week 6")
         }
 
       paragraph {
-        image("/Users/AKA/Pictures/Michellaneous/raven.png", name = "raven.png")
-        image("$imageRoot/raven.png", name = "raven.png")
-        image("http://www.kalhauge.dk/Mathias/mig_selv.png", name = "migselv.png")
+        image(Address("/Users/AKA/Pictures/Michellaneous/raven.png"), name = "raven.png")
+        image(Address("$imageRoot/raven.png"), name = "raven.png")
+        image(Address("http://www.kalhauge.dk/Mathias/mig_selv.png"), name = "migselv.png")
         }
       paragraph("another text")
       java("""
@@ -37,13 +38,13 @@ fun Folder.full() = document("full", "Main Page") {
           text {
             text("The `Second` ")
             text("*Second and a half* ")
-            text { reference("../week-06/info/sec:insertion-sort") }
+            text { reference("../week-06/info/sec=insertion-sort") }
             }
           }
         paragraph("Third")
         list(Listing.Type.ARABIC) {
           //section("In a list?") {
-            paragraph("some content with {{P1:slides-01}} and {{KOTLIN}}")
+            paragraph("some content with {*P1*:/slides-01} and {KOTLIN} look in section: {sec=second}")
           //}
           paragraph("Uno")
           paragraph("Due")
@@ -99,30 +100,31 @@ fun Folder.full() = document("full", "Main Page") {
 fun Folder.small() = document("week-06/info", "Sorting algorithms") {
   list {
     paragraph("First")
-    paragraph("Second") {
+    paragraph("Secondisch") {
       text(":pencil: ") {
-        reference("../../full/sec:second")
+        reference("../../full/sec=second")
         }
       }
     }
   section("Insertion sort") {
     paragraph("""bla *bla* bla""") {
-      reference("../../full/top")
+      reference("../../full")
       }
     }
   }
 
 fun main() {
   val host = FileHost(conf)
-  val context =
-    folder("soft2020spring") {
+  val context = root {
+    folder("docs") {
       file("notes.txt", """Hello the {{name}} how are you?""", mapOf("name" to "Kurt Hansen"))
       folder("ALG") {
         //resources = "cache"
         full()
         small()
-        }
       }
-  GfmHandler(host, context).handle(true, true)
+    }
+  }
+  GfmHandler(host, context).handle(true)
   // Folder.targets.forEach { (label, target) -> println("$label --> $target") }
   }
