@@ -16,7 +16,7 @@ class Section(
   override var context = context ?: FreeContext
   override var title = text(title)
   val label = label ?: "sec=${title.anchorize()}"
-  override val key get() = normalize("${context.keyPath}/$label")
+  override val key get() = normalize(context.keyPath, label)
   override val filePath get() = context.filePath
   override val keyPath get() = context.keyPath
   override fun register(target: Target) = context.register(target)

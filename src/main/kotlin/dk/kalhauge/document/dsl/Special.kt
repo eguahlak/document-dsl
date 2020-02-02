@@ -8,9 +8,10 @@ import dk.kalhauge.document.dsl.structure.FreeContext
 interface Special
 
 class TableOfContent(
+    context: Context?,
     val document: Document,
     val depth: Int
-    ): Block.Child, Special {
+    ): Listing(context, Listing.Type.BULLETED), Special {
   override var context: Context = FreeContext
   override fun isEmpty() = false
 
@@ -24,16 +25,16 @@ class TableOfContent(
       }
     }
 
-  fun Block.Parent.generate() =
-    list {
-      if (depth > 0) list {
-        create(document, depth - 1)
-        }
+  fun generate(): Listing {
+    if (depth > 0) list {
+      create(document, depth - 1)
       }
+    return this
+    }
 
   }
 
 fun Document.toc(depth: Int = 2) =
-  TableOfContent(this, depth).also {
+  TableOfContent(this, this, depth).also {
     add(it)
     }

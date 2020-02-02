@@ -45,7 +45,6 @@ class GfmHandler(private val host: Host, val root: Tree.Root) {
         is Code -> handle(it)
         is Listing -> handle(it)
         is Table -> handle(it)
-        // is TableOfContent -> { }
         else -> TODO("Handling for new Block.Child type: $it")
         }
       }
@@ -65,8 +64,8 @@ class GfmHandler(private val host: Host, val root: Tree.Root) {
     }
 
   private fun handle(section: Section) = with (host) {
-     val numbering = if (configuration.hasNumbers) section.prefix else ""
-    printLine(section.level of "#", "$numbering${evaluate(section.title)}" )
+    val prefix = if (configuration.hasNumbers) section.prefix else ""
+    printLine(section.level of "#", "$prefix${evaluate(section.title)}" )
     handle(section.children)
     }
 
@@ -82,8 +81,7 @@ class GfmHandler(private val host: Host, val root: Tree.Root) {
   private fun handle(special: Special): Unit = with (host) {
     when (special) {
       is TableOfContent -> {
-        tocOf(special.document, " * ")
-        printLine()
+        handle(special.generate())
         }
       else -> TODO("Implement special")
       }
@@ -159,17 +157,22 @@ class GfmHandler(private val host: Host, val root: Tree.Root) {
 
   private fun evaluate(reference: Reference): String {
     val target = reference.target.fixate()
-    val title = if (reference.title == null && target is Prefixed && host.configuration.hasNumbers)
+    val title =
+        if (reference.title == null && target is Prefixed && host.configuration.hasNumbers)
             "${target.prefix}${evaluate(target.title)}"
-        else
-            evaluate(reference.title ?: target.title)
+        else evaluate(reference.title ?: target.title)
+    val url =
+        if (target is Prefixed && host.configuration.hasNumbers)
+            "${target.prefix}${evaluate(target.title)}".anchorize()
+        else evaluate(target.title).anchorize()
+
     val documentPath = reference.context.filePath
     when (target) {
       is Document -> {
         return "[$title](${target.filePath from documentPath}.md)"
         }
       is Section -> {
-        return "[$title](${(target.filePath from documentPath) - ".md"}#${title.anchorize()})"
+        return "[$title](${(target.filePath from documentPath) - ".md"}#${url.anchorize()})"
         }
       is CachedResource -> {
         val absolutePath = "${root.resources}/${target.name}"

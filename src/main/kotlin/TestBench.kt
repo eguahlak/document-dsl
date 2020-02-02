@@ -16,7 +16,7 @@ fun Folder.full() = document("full", "Main Page") {
       paragraph {
         text("A *tex*t")
         text("And one more", Text.Format.UNDERLINE)
-        link(Address.Web("https://kotlin-lang.org"), title = "Kotlin homepage", label = "/KOTLIN")
+        link(Address.Web("https://kotlin-lang.org"), title = "Kotlin homepage", label = "KOTLIN")
         reference(r1)
         reference("../week-06/info", "Go to week 6")
         }
@@ -53,6 +53,7 @@ fun Folder.full() = document("full", "Main Page") {
         paragraph("Fourth")
       }
     }
+
     section("Second") {
       section("Seconds first")
       paragraph { text("Lorem ipsum") }
@@ -95,6 +96,20 @@ fun Folder.full() = document("full", "Main Page") {
       }
 
     }
+    section("Third", label = "THIRD") {
+      paragraph("Tredje")
+      }
+    section("Fourth", label = "/NO4") {
+      paragraph {
+        reference("sec=second", "T2")
+        reference("THIRD", "T3")
+        reference("/NO4", "T4")
+        }
+      }
+  }
+
+val someSection = section("Some Section", label = "SOME") {
+  paragraph("Text to some section")
   }
 
 fun Folder.small() = document("week-06/info", "Sorting algorithms") {
@@ -106,11 +121,14 @@ fun Folder.small() = document("week-06/info", "Sorting algorithms") {
         }
       }
     }
+  add(someSection)
   section("Insertion sort") {
     paragraph("""bla *bla* bla""") {
       reference("../../full")
+      reference("SOME")
       }
     }
+
   }
 
 fun main() {

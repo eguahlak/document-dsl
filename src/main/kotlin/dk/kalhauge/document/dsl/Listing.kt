@@ -7,7 +7,7 @@ import dk.kalhauge.document.dsl.structure.Context
 import dk.kalhauge.document.dsl.structure.FreeContext
 
 // depth
-class Listing(context: Context?, val type: Type) : Block.BaseParent(), Block.Child {
+open class Listing(context: Context?, val type: Type) : Block.BaseParent(), Block.Child {
   override var context = context ?: FreeContext
   override val filePath get() = context.filePath
   override val keyPath get() = context.keyPath
