@@ -87,6 +87,18 @@ fun text(
     this.build()
     }
 
+fun freeText(
+    content: String? = null,
+    format: Format = NORMAL,
+    build: Text.() -> Unit = {}
+    ) =
+  Text(null, format).apply {
+    content?.let { c ->
+      readContent(c.iterator())
+      }
+    this.build()
+    }
+
 fun Inline.BaseContainer.text(
     content: String? = null,
     format: Format = NORMAL,

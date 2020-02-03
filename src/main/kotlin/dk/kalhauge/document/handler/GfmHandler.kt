@@ -68,11 +68,6 @@ class GfmHandler(private val host: Host, val root: Tree.Root) {
     handle(section.children)
     }
 
-  private fun handle(capture: Capture) = with (host) {
-    printLine("######", evaluate(capture.title))
-    handle(capture.children)
-    }
-
   private fun tocOf(parent: Block.Parent, indent: String): Unit = with (host) {
     parent.children.filterIsInstance<Section>().forEach {
       val title = "${if (configuration.hasNumbers) it.prefix else ""}${it.title}"
@@ -104,6 +99,22 @@ class GfmHandler(private val host: Host, val root: Tree.Root) {
         if (paragraph.asQuote) printLine("> ${evaluate(it)}  ", 0)
         else printLine("${evaluate(it)}  ", 0)
         }
+      printLine()
+      }
+    }
+
+  private fun handle(capture: Capture) = with (host) {
+    val parent = capture.context
+    if (parent is Listing) {
+      printLine("${parent markFor 0} ######", evaluate(capture.title), 0)
+      capture.parts.forEachIndexed { index, part ->
+        if (index == 0) printLine("   ${evaluate(part)}  ", 0)
+        else printLine("   ${evaluate(part)}", 0)
+        }
+      }
+    else {
+      printLine("######", evaluate(capture.title), 0)
+      capture.parts.forEach { printLine("${evaluate(it)}  ", 0) }
       printLine()
       }
     }

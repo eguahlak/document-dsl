@@ -127,8 +127,18 @@ fun Folder.full() = document("full", "Main Page") {
         If that is not unique, add "-1", "-2", "-3",... to make it unique
         """.trimIndent())
       capture("to mock a Mockingbird") {
-        paragraph("Raymond Smullyan")
-        paragraph("Oxford University Press")
+        text("Raymond Smullyan")
+        text("Oxford University Press")
+        }
+      list {
+        capture("to mock a Mockingbird") {
+          text("Raymond Smullyan")
+          text("Oxford University Press")
+          }
+        capture("to mock a Mockingbird") {
+          text("Raymond Smullyan")
+          text("Oxford University Press")
+          }
         }
       }
   }
