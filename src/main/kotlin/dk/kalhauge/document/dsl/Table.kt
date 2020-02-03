@@ -11,6 +11,7 @@ enum class HorizontalAlignment { LEFT, CENTER, RIGHT, JUSTIFY }
 enum class VerticalAlignment { TOP, MIDDLE, BOTTOM }
 
 class Table(context: Context?): Block.Child {
+  var hideIfEmpty = true
   override var context = context ?: FreeContext
   val columns = mutableListOf<Column>()
   val rows = mutableListOf<Row>()

@@ -15,7 +15,7 @@ class Section(
     ) : Block.BaseParent(), Block.Child, Target, Prefixed {
   override var context = context ?: FreeContext
   override var title = text(title)
-  val label = label ?: "sec=${title.anchorize()}"
+  private val label = label ?: "sec=${title.anchorize()}"
   override val key get() = normalize(context.keyPath, label)
   override val filePath get() = context.filePath
   override val keyPath get() = context.keyPath
@@ -57,4 +57,39 @@ fun section(title: String, label: String? = null, hashes: Int? = null, build: Se
 
 fun Block.Parent.numberOf(section: Section) =
     children.filterIsInstance<Section>().indexOf(section)
+
+class Capture(
+    context: Context?,
+    title: String,
+    label: String? = null
+    ) : Block.BaseParent(), Block.Child, Target {
+  override var context = context ?: FreeContext
+  override var title = text(title)
+  private val label = label ?: "cap=${title.anchorize()}"
+  override val key get() = normalize(context.keyPath, label)
+  override val filePath get() = context.filePath
+  override val keyPath get() = context.keyPath
+  override fun register(target: Target) = context.register(target)
+  override fun find(key: String) = context.find(key)
+  init {
+    register()
+    }
+
+  override fun register() {
+    this.context.register(this)
+    }
+  override fun toString() = "{$title/:$label}"
+  override fun isEmpty() = children.isEmpty() && title.isEmpty()
+  }
+
+fun Block.BaseParent.capture(title: String, label: String? = null, hashes: Int? = null, build: Capture.() -> Unit = {}) =
+    Capture(this, title, label).also {
+      it.build()
+      add(it)
+      }
+
+fun capture(title: String, label: String? = null, hashes: Int? = null, build: Capture.() -> Unit = {}) =
+    Capture(null, title, label).also {
+      it.build()
+      }
 

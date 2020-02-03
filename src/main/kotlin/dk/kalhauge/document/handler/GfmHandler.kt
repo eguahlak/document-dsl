@@ -11,8 +11,6 @@ class GfmHandler(private val host: Host, val root: Tree.Root) {
     if (printTargets) {
       println("Targets:")
       root.targets.forEach { println("${it.key} --> ${it.value}") }
-      println("-----------------")
-      FreeContext.targets.forEach { println("${it.key} ==> $it") }
       println()
       }
     root.branches.forEach {
@@ -41,6 +39,7 @@ class GfmHandler(private val host: Host, val root: Tree.Root) {
       when (it) {
         is Special -> handle(it)
         is Section -> handle(it)
+        is Capture -> handle(it)
         is Paragraph -> handle(it)
         is Code -> handle(it)
         is Listing -> handle(it)
@@ -67,6 +66,11 @@ class GfmHandler(private val host: Host, val root: Tree.Root) {
     val prefix = if (configuration.hasNumbers) section.prefix else ""
     printLine(section.level of "#", "$prefix${evaluate(section.title)}" )
     handle(section.children)
+    }
+
+  private fun handle(capture: Capture) = with (host) {
+    printLine("######", evaluate(capture.title))
+    handle(capture.children)
     }
 
   private fun tocOf(parent: Block.Parent, indent: String): Unit = with (host) {
@@ -97,7 +101,8 @@ class GfmHandler(private val host: Host, val root: Tree.Root) {
       }
     else {
       paragraph.parts.forEach {
-        printLine("${evaluate(it)}  ", 0)
+        if (paragraph.asQuote) printLine("> ${evaluate(it)}  ", 0)
+        else printLine("${evaluate(it)}  ", 0)
         }
       printLine()
       }
@@ -123,11 +128,14 @@ class GfmHandler(private val host: Host, val root: Tree.Root) {
     }
 
   private fun handle(table: Table) = with (host) {
+    if (table.hideIfEmpty && table.rows.isEmpty()) return
     printLine(table.columns.joinToString(" | ", "| ", " |") { evaluate(it.title) }, 0)
     printLine(table.columns.joinToString(" | ", "| ", " |") { evaluate(it.alignment) }, 0)
     table.rows.forEach { row ->
       printLine(row.children.joinToString(" | ", "| ", " |") { evaluate(it) }, 0)
       }
+    if (table.rows.isEmpty())
+      printLine("|"+(table.columns.size of "  |" ), 0)
     printLine()
     }
 

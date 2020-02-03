@@ -5,7 +5,7 @@ import dk.kalhauge.document.dsl.structure.Context
 import dk.kalhauge.document.dsl.structure.FreeContext
 import dk.kalhauge.document.dsl.structure.Inline
 
-class Paragraph(context: Context?): Inline.BaseContainer(), Block.Child {
+class Paragraph(context: Context?, val asQuote: Boolean = false): Inline.BaseContainer(), Block.Child {
   override var context = context ?: FreeContext
   override val filePath get() = context.filePath
   override val keyPath get() = context.keyPath
@@ -45,3 +45,28 @@ fun paragraph(text: Text, build: Paragraph.() -> Unit = {}) =
       it.build()
       }
 
+fun Block.BaseParent.quote(content: String? = null, build: Paragraph.() -> Unit = {}) =
+    Paragraph(this, true).also { paragraph ->
+      content?.let { content -> paragraph.add(text(content)) }
+      paragraph.build()
+      add(paragraph)
+      }
+
+fun Block.BaseParent.quote(text: Text, build: Paragraph.() -> Unit = {}) =
+    Paragraph(this, true).also {
+      it.add(text)
+      it.build()
+      add(it)
+      }
+
+fun quote(content: String? = null, build: Paragraph.() -> Unit = {}) =
+    Paragraph(null, true).also { paragraph ->
+      content?.let { content -> paragraph.add(text(content)) }
+      paragraph.build()
+      }
+
+fun quote(text: Text, build: Paragraph.() -> Unit = {}) =
+    Paragraph(null, true).also {
+      it.add(text)
+      it.build()
+      }

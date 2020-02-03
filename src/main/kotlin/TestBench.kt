@@ -106,6 +106,31 @@ fun Folder.full() = document("full", "Main Page") {
         reference("/NO4", "T4")
         }
       }
+    section("Two empty tables") {
+      paragraph("with hideIfEmpty = `true` (/default/)")
+      table {
+        left("Name")
+        right("Salary")
+        }
+      paragraph("with hideIfEmpty = `false`")
+      table {
+        hideIfEmpty = false
+        left("Name")
+        right("Salary")
+        }
+      quote("""
+        And a quoted string
+        It downcases the string
+        remove anything that is not a letter, number, space or hyphen 
+        (see the source for how Unicode is handled)
+        changes any space to a hyphen.
+        If that is not unique, add "-1", "-2", "-3",... to make it unique
+        """.trimIndent())
+      capture("to mock a Mockingbird") {
+        paragraph("Raymond Smullyan")
+        paragraph("Oxford University Press")
+        }
+      }
   }
 
 val someSection = section("Some Section", label = "SOME") {

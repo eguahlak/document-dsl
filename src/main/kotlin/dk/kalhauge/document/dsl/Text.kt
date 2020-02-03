@@ -125,4 +125,9 @@ fun Text.italic(content: String? = null, build: Text.() -> Unit = {}) = text(con
 fun Text.underline(content: String? = null, build: Text.() -> Unit = {}) = text(content, UNDERLINE, build)
 fun Text.strike(content: String? = null, build: Text.() -> Unit = {}) = text(content, STRIKE, build)
 
+fun Inline.BaseContainer.bold(content: String? = null, build: Text.() -> Unit = {}) = text(content, BOLD, build)
+fun Inline.BaseContainer.italic(content: String? = null, build: Text.() -> Unit = {}) = text(content, ITALIC, build)
+fun Inline.BaseContainer.underline(content: String? = null, build: Text.() -> Unit = {}) = text(content, UNDERLINE, build)
+fun Inline.BaseContainer.strike(content: String? = null, build: Text.() -> Unit = {}) = text(content, STRIKE, build)
+
 fun String.toText() = text(this)
