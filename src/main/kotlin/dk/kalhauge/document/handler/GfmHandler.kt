@@ -193,6 +193,9 @@ class GfmHandler(private val host: Host, val root: Tree.Root) {
       is Section -> {
         return "[$title](${(target.filePath from documentPath) - ".md"}#${url.anchorize()})"
         }
+      is Capture -> {
+        return "[$title](${(target.filePath from documentPath) - ".md"}#${url.anchorize()})"
+        }
       is CachedResource -> {
         val absolutePath = "${root.resources}/${target.name}"
         when (target.source) {
