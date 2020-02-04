@@ -16,16 +16,22 @@ infix fun String.from(other: String): String {
   }
 
 private fun skipEquals(target: Path<String>?, source: Path<String>?): Path<String>? {
-  if (source == null)
-      return target
-  if (target != null && target.first == source.first)
+  // TODO Refactor :-)
+  if (source == null) return target
+  if (target == null) return Path("", null)
+  if (source.rest == null) {
+    if (target.rest == null && target.first == source.first) return Path("", null)
+    return target
+    }
+  if (target.first == source.first)
       return skipEquals(target.rest, source.rest)
   return dotOut(target, source)
   }
 
 private fun dotOut(target: Path<String>?, source: Path<String>?): Path<String>? {
-  if (source == null)
+  if (source?.rest == null)
       return target
+  // if (source.rest == null && target?.rest == null)  return Path("", null)
   return Path("..", dotOut(target, source.rest))
   }
 

@@ -9,7 +9,7 @@ class StringTests {
   fun testCommonRoot() {
     assertEquals(
       "../../ALG/cache/pic.png",
-      "/docs/ALG/cache/pic.png" from "/docs/ML/week-09"
+      "/docs/ALG/cache/pic.png" from "/docs/ML/week-09/README"
       )
     }
 
@@ -17,7 +17,7 @@ class StringTests {
   fun testCommonPath() {
     assertEquals(
       "all/files/pic.png",
-      "/docs/ML/week-09/all/files/pic.png" from "/docs/ML/week-09"
+      "/docs/ML/week-09/all/files/pic.png" from "/docs/ML/week-09/README"
       )
     }
 
@@ -26,7 +26,7 @@ class StringTests {
   fun testCommonParent() {
     assertEquals(
       "../resources/pic.png",
-      "/docs/ML/resources/pic.png" from "/docs/ML/week-09"
+      "/docs/ML/resources/pic.png" from "/docs/ML/week-09/README"
       )
     }
 
@@ -34,7 +34,7 @@ class StringTests {
   fun testReoccuringNames() {
     assertEquals(
       "../../resources/pic.png",
-      "/docs/ML/resources/pic.png" from "/docs/ML/week-09/resources"
+      "/docs/ML/resources/pic.png" from "/docs/ML/week-09/resources/README"
       )
     }
 
@@ -42,10 +42,31 @@ class StringTests {
   fun testDefault() {
     assertEquals(
       "../../resources/pic.png",
-      "/docs/resources/pic.png" from "/docs/ML/week-09"
+      "/docs/resources/pic.png" from "/docs/ML/week-09/README"
       )
     }
 
+  @Test
+  fun testSameFolder() {
+    assertEquals(
+      "curriculum",
+      "/docs/ML/curriculum" from "/docs/ML/README"
+      )
+    }
+
+  @Test
+  fun testSameDocument() {
+    assertEquals(
+      "",
+      "/docs/ML/README" from "/docs/ML/README"
+      )
+    }
+
+  @Test
+  fun testCourseListSituation() {
+    "ML/README"
+    "/docs/ML/README" from "/docs/README"
+    }
   @Test
   fun testNomalizedNoNameNoDots() {
     assertEquals(
