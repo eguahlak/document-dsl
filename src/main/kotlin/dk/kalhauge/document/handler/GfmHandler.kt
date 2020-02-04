@@ -185,7 +185,7 @@ class GfmHandler(private val host: Host, val root: Tree.Root) {
             "${target.prefix}${evaluate(target.title)}".anchorize()
         else evaluate(target.title).anchorize()
 
-    val folderPath = reference.context.filePath.substringBeforeLast("/")
+    val folderPath = reference.context.filePath
     when (target) {
       is Document -> {
         return "[$title](${target.filePath from folderPath}.md)"
