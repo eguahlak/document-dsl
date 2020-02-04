@@ -185,16 +185,16 @@ class GfmHandler(private val host: Host, val root: Tree.Root) {
             "${target.prefix}${evaluate(target.title)}".anchorize()
         else evaluate(target.title).anchorize()
 
-    val documentPath = reference.context.filePath
+    val folderPath = reference.context.filePath.substringBeforeLast("/")
     when (target) {
       is Document -> {
-        return "[$title](${target.filePath from documentPath}.md)"
+        return "[$title](${target.filePath from folderPath}.md)"
         }
       is Section -> {
-        return "[$title](${(target.filePath from documentPath) - ".md"}#${url.anchorize()})"
+        return "[$title](${(target.filePath from folderPath) - ".md"}#${url.anchorize()})"
         }
       is Capture -> {
-        return "[$title](${(target.filePath from documentPath) - ".md"}#${url.anchorize()})"
+        return "[$title](${(target.filePath from folderPath) - ".md"}#${url.anchorize()})"
         }
       is CachedResource -> {
         val absolutePath = "${root.resources}/${target.name}"
@@ -202,7 +202,7 @@ class GfmHandler(private val host: Host, val root: Tree.Root) {
           is Address.Disk -> host.updateFile(target.source.path, absolutePath)
           is Address.Web -> host.downloadFile(target.source.url, absolutePath)
           }
-        val relativePath = absolutePath from documentPath.substringBeforeLast('/')
+        val relativePath = absolutePath from folderPath
         return "${if (target.render) "!" else ""}[$title]($relativePath)"
         }
       is Resource -> {
