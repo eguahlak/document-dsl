@@ -12,7 +12,7 @@ class Section(
     title: String,
     label: String? = null,
     level: Int? = null,
-    number: Int? = null
+    val customNumber: Int? = null
     ) : Block.BaseParent(), Block.Child, Target, Prefixed {
   override var context = context ?: FreeContext
   override var title = text(title)
@@ -22,9 +22,8 @@ class Section(
   override val keyPath get() = context.keyPath
   override fun register(target: Target) = context.register(target)
   override fun find(key: String) = context.find(key)
-  private val numberField = number
 
-  val number get() = numberField ?:
+  val number get() = customNumber ?:
       context.let { if (it is Block.Parent) it.numberOf(this) + 1 else 1 }
   override val prefix get() =
       context.let { if (it is Section) "${it.number}.$number " else "$number " }
@@ -48,16 +47,26 @@ class Section(
 
   }
 
-fun Block.BaseParent.section(title: String, label: String? = null, hashes: Int? = null, build: Section.() -> Unit = {}) =
-    Section(this, title, label, hashes).also {
-      it.build()
-      add(it)
-      }
+fun Block.BaseParent.section(
+    title: String,
+    label: String? = null,
+    level: Int? = null,
+    number: Int? = null,
+    build: Section.() -> Unit = {}) =
+  Section(this, title, label, level, number).also {
+    it.build()
+    add(it)
+    }
 
-fun section(title: String, label: String? = null, hashes: Int? = null, build: Section.() -> Unit = {}) =
-    Section(null, title, label, hashes).also {
-      it.build()
-      }
+fun section(
+    title: String,
+    label: String? = null,
+    level: Int? = null,
+    number: Int? = null,
+    build: Section.() -> Unit = {}) =
+  Section(null, title, label, level, number).also {
+    it.build()
+    }
 
 fun Block.Parent.numberOf(section: Section) =
     children.filterIsInstance<Section>().indexOf(section)
