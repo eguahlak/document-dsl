@@ -11,7 +11,8 @@ class Section(
     context: Context?,
     title: String,
     label: String? = null,
-    level: Int? = null
+    level: Int? = null,
+    number: Int? = null
     ) : Block.BaseParent(), Block.Child, Target, Prefixed {
   override var context = context ?: FreeContext
   override var title = text(title)
@@ -21,9 +22,12 @@ class Section(
   override val keyPath get() = context.keyPath
   override fun register(target: Target) = context.register(target)
   override fun find(key: String) = context.find(key)
+  private val numberField = number
 
-  val number get() = context.let { if (it is Block.Parent) it.numberOf(this) + 1 else 1 }
-  override val prefix get() = context.let { if (it is Section) "${it.number}.$number " else "$number " }
+  val number get() = numberField ?:
+      context.let { if (it is Block.Parent) it.numberOf(this) + 1 else 1 }
+  override val prefix get() =
+      context.let { if (it is Section) "${it.number}.$number " else "$number " }
   private val forcedLevel = level
   val level: Int get() = forcedLevel ?: context.let { if (it is Section) it.level + 1 else 1}
 
