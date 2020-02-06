@@ -21,6 +21,7 @@ interface Host {
     }
   fun updateFile(sourcePath: String, targetPath: String)
   fun downloadFile(url: String, targetPath: String)
+  fun readLines(filename: String): List<String>
   }
 
 class ConsoleHost(override val configuration: Configuration) : Host {
@@ -32,6 +33,10 @@ class ConsoleHost(override val configuration: Configuration) : Host {
       field = value
       if (field < 0) throw IllegalArgumentException("Indent can't be negative")
       }
+
+  override fun readLines(filename: String): List<String> {
+    return emptyList()
+    }
 
   override fun print(text: String?) {
     if (text == null) return
@@ -87,6 +92,12 @@ class FileHost(override val configuration: Configuration) : Host {
       println("${indent of " "}$text")
       for (i in 1..emptyLineCount) println()
       }
+    }
+
+  override fun readLines(filename: String): List<String> {
+    val file = File(courseRoot, filename)
+    if (file.exists()) return file.readLines()
+    else return listOf("File: ${file.absolutePath} can't be found")
     }
 
   override fun open(filename: String) {

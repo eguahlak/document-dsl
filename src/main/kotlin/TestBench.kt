@@ -163,7 +163,13 @@ fun Folder.small() = document("week-06/info", "Sorting algorithms") {
       reference("SOME")
       }
     }
-
+  section("Student List") {
+    table {
+      left("Name")
+      left("Email") { "[$it](mailto:$it)" }
+      csv("info/l20sou1af.csv")
+      }
+    }
   }
 
 fun main() {

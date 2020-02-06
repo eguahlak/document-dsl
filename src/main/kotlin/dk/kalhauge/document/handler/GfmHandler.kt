@@ -142,8 +142,22 @@ class GfmHandler(private val host: Host, val root: Tree.Root) {
     if (table.hideIfEmpty && table.rows.isEmpty()) return
     printLine(table.columns.joinToString(" | ", "| ", " |") { evaluate(it.title) }, 0)
     printLine(table.columns.joinToString(" | ", "| ", " |") { evaluate(it.alignment) }, 0)
-    table.rows.forEach { row ->
-      printLine(row.children.joinToString(" | ", "| ", " |") { evaluate(it) }, 0)
+    table.rows.forEach { rowData ->
+      when (rowData) {
+        is Table.Row ->
+          printLine(rowData.children.joinToString(" | ", "| ", " |") { evaluate(it) }, 0)
+        is Table.FileRows -> {
+          val lines = readLines(rowData.filename)
+          for (line in lines)
+            printLine(
+              splitCsvLine(line)
+                .mapIndexed() { index, cell ->
+                  if (index > table.columns.size) cell
+                  else table.columns[index].convert(cell)
+                  }
+                .joinToString(" | ", "| ", " |") { it }, 0)
+          }
+        }
       }
     if (table.rows.isEmpty())
       printLine("|"+(table.columns.size of "  |" ), 0)

@@ -14,37 +14,53 @@ class Table(context: Context?): Block.Child {
   var hideIfEmpty = true
   override var context = context ?: FreeContext
   val columns = mutableListOf<Column>()
-  val rows = mutableListOf<Row>()
+  val rows = mutableListOf<RowData>()
+
+  fun csv(filename: String) {
+    rows += FileRows(filename)
+    }
 
   override fun isEmpty() = columns.isEmpty() && rows.isEmpty()
 
-  fun column(title: String?, alignment: HorizontalAlignment, build: Column.() -> Unit = { }) =
-      Column(this, title, alignment).also(build)
+  fun column(
+      title: String,
+      name: String? = null,
+      alignment: HorizontalAlignment,
+      convert: (String) -> String = { it }
+      ) = Column(this, title, name, alignment, convert)
 
-  fun left(title: String? = null, build: Column.() -> Unit = {}) =
-      column(title, LEFT, build)
+  fun left(title: String, name: String? = null, convert: (String) -> String = { it }) =
+      column(title, name, LEFT, convert)
 
-  fun center(title: String? = null, build: Column.() -> Unit = {}) =
-      column(title, CENTER, build)
+  fun center(title: String, name: String? = null, convert: (String) -> String = { it }) =
+      column(title, name, CENTER, convert)
 
-  fun right(title: String? = null, build: Column.() -> Unit = {}) =
-      column(title, RIGHT, build)
+  fun right(title: String, name: String? = null, convert: (String) -> String = { it }) =
+      column(title, name, RIGHT, convert)
 
-  fun justify(title: String? = null, build: Column.() -> Unit = {}) =
-      column(title, JUSTIFY, build)
+  fun justify(title: String, name: String? = null, convert: (String) -> String = { it }) =
+      column(title, name, JUSTIFY, convert)
 
   fun row(alignment: VerticalAlignment = TOP, build: Row.() -> Unit = {}) =
     Row(this, alignment).also(build)
 
-  class Column(val table: Table, title: String?, val alignment: HorizontalAlignment) {
+  class Column(
+      private val table: Table,
+      title: String,
+      name: String?,
+      val alignment: HorizontalAlignment,
+      val convert: (String) -> String
+      ) {
     val index = table.columns.size
+    val name = name ?: title
     var title = text(title)
 
     init { table.columns += this }
-
     }
 
-  class Row(val table: Table, val alignment: VerticalAlignment) : Block.BaseParent() {
+  interface RowData
+
+  class Row(val table: Table, val alignment: VerticalAlignment) : Block.BaseParent(), RowData {
     override val filePath get() = table.context.filePath
     override val keyPath get() = table.context.keyPath
     override fun register(target: Target) = table.context.register(target)
@@ -56,7 +72,11 @@ class Table(context: Context?): Block.Child {
 
     }
 
+  class FileRows(val filename: String): RowData
+
   }
+
+
 
 fun Block.BaseParent.table(build: Table.() -> Unit = { }) =
   Table(this).also {

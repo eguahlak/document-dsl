@@ -64,8 +64,10 @@ class StringTests {
 
   @Test
   fun testCourseListSituation() {
-    "ML/README"
-    "/docs/ML/README" from "/docs/README"
+    assertEquals(
+      "ML/README",
+      "/docs/ML/README" from "/docs/README"
+      )
     }
   @Test
   fun testNomalizedNoNameNoDots() {
