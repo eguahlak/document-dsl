@@ -1,6 +1,7 @@
 package dk.kalhauge.document.handler
 
 import dk.kalhauge.document.dsl.Configuration
+import dk.kalhauge.document.dsl.Configuration.OutputLevel.*
 import dk.kalhauge.util.copyTo
 import dk.kalhauge.util.of
 import dk.kalhauge.util.stackOf
@@ -73,6 +74,10 @@ class FileHost(override val configuration: Configuration) : Host {
   val root: File get() = configuration.root
   val outputs = stackOf<PrintWriter>()
 
+  private fun console(level: Configuration.OutputLevel, line: String) {
+    if (configuration.outputLevel >= level) println(line)
+    }
+
   override var indent: Int = 0
     get() = field
     set(value) {
@@ -82,7 +87,7 @@ class FileHost(override val configuration: Configuration) : Host {
 
   override fun print(text: String?) {
     if (text == null) return
-    kotlin.io.print(text)
+    outputs.peek().print(text)
     }
 
   override fun printLine(text: String?, emptyLineCount: Int) {
@@ -114,31 +119,26 @@ class FileHost(override val configuration: Configuration) : Host {
     }
 
   override fun updateFile(sourcePath: String, targetPath: String) {
-    print("updating $sourcePath to $targetPath ")
     val source = File(sourcePath)
     val target = File(courseRoot, targetPath)
-    if (!source.exists()) {
-      println("$sourcePath doesn't exist on this machine")
-      }
+    if (!source.exists())
+      console(WARNING, "UPDATE: $sourcePath doesn't exist on this machine")
     else if (!target.exists() || source.lastModified() > target.lastModified()) {
       source.copyTo(target, overwrite = true)
-      println("done!")
+      console(INFO, "UPDATE: $sourcePath updated to $targetPath!")
       }
-    else {
-      println("already up to date!")
-      }
+    else console(VERBOSE, "UPDATE: $targetPath already up to date!")
     }
 
   override fun downloadFile(url: String, targetPath: String) {
-    print("downloading $url to $targetPath ")
     val source = URL(url)
     val target = File(courseRoot, targetPath)
     if (!target.exists()) {
       source.copyTo(target)
-      println("done!")
+      console(WARNING, "DOWNLOAD: $url downloaded to $targetPath!")
       }
     else {
-      println("already downloaded!")
+      console(VERBOSE, "DOWNLOAD: $url already downloaded!")
       }
     }
 

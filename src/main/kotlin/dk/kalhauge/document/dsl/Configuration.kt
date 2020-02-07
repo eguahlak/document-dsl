@@ -5,8 +5,10 @@ import java.io.File
 class Configuration(
     courseRoot: String? = null,
     val hasTitle: Boolean = false,
-    val hasNumbers: Boolean = false
+    val hasNumbers: Boolean = false,
+    val outputLevel: OutputLevel = OutputLevel.WARNING
     ) {
+  enum class OutputLevel { NONE, WARNING, INFO, VERBOSE }
   val properties = mutableMapOf<String, String>()
   val contextRoot: String
   val root: File

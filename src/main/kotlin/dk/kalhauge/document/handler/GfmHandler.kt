@@ -10,7 +10,9 @@ class GfmHandler(private val host: Host, val root: Tree.Root) {
   fun handle(printTargets: Boolean = false) {
     if (printTargets) {
       println("Targets:")
-      root.targets.forEach { println("${it.key} --> ${it.value}") }
+      root.targets.asIterable()
+        .sortedBy { it.key }
+        .forEach { println("${it.key} --> ${it.value}") }
       println()
       }
     root.branches.forEach {
