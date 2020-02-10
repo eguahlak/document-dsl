@@ -3,7 +3,7 @@ import dk.kalhauge.document.dsl.structure.root
 import dk.kalhauge.document.handler.FileHost
 import dk.kalhauge.document.handler.GfmHandler
 
-val conf = Configuration(hasTitle = true, hasNumbers = true)
+val conf = Configuration(hasTitle = true, hasNumbers = true, outputLevel = Configuration.OutputLevel.VERBOSE)
 val imageRoot = conf["image.root"]
 
 fun Folder.full() = document("full", "Main Page") {
