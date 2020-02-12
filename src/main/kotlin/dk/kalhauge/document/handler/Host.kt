@@ -6,6 +6,7 @@ import dk.kalhauge.util.copyTo
 import dk.kalhauge.util.of
 import dk.kalhauge.util.stackOf
 import java.io.File
+import java.io.IOException
 import java.io.PrintWriter
 import java.net.URL
 
@@ -121,8 +122,10 @@ class FileHost(override val configuration: Configuration) : Host {
   override fun updateFile(sourcePath: String, targetPath: String) {
     val source = File(sourcePath)
     val target = File(courseRoot, targetPath)
-    if (!source.exists())
-      console(WARNING, "UPDATE: $sourcePath doesn't exist on this machine")
+    if (!source.exists()) {
+      if (!target.exists()) console(ERROR, "UPDATE: $sourcePath doesn't exist on this machine")
+      else console(VERBOSE, "UPDATE: using existing target for $sourcePath")
+      }
     else if (!target.exists() || source.lastModified() > target.lastModified()) {
       source.copyTo(target, overwrite = true)
       console(INFO, "UPDATE: $sourcePath updated to $targetPath!")
@@ -134,8 +137,13 @@ class FileHost(override val configuration: Configuration) : Host {
     val source = URL(url)
     val target = File(courseRoot, targetPath)
     if (!target.exists()) {
-      source.copyTo(target)
-      console(WARNING, "DOWNLOAD: $url downloaded to $targetPath!")
+      try {
+        source.copyTo(target)
+        console(INFO, "DOWNLOAD: $url downloaded to $targetPath!")
+        }
+      catch (e : IOException) {
+        console(ERROR, "DOWNLOAD: problems downloading $url")
+        }
       }
     else {
       console(VERBOSE, "DOWNLOAD: $url already downloaded!")

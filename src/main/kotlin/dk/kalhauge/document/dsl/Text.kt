@@ -47,7 +47,8 @@ class Text(context: Context?, val format: Format = NORMAL) : Inline.BaseContaine
       '/' -> Text(this, ITALIC).also { target.add(it) }.readContent(chars)
       '_' -> Text(this, UNDERLINE).also { target.add(it) }.readContent(chars)
       '~' -> Text(this, STRIKE).also { target.add(it) }.readContent(chars)
-      '`' -> Text(this, CODE).also { target.add(it) }.readContent(chars)
+      // '`' -> Text(this, CODE).also { target.add(it) }.readContent(chars)
+      '`' -> Text(this, CODE).also { target.add(it) }.readInlineCode(chars)
       '{' -> {
         readReference(chars)
         target.readContent(chars)
@@ -55,6 +56,20 @@ class Text(context: Context?, val format: Format = NORMAL) : Inline.BaseContaine
       else -> IllegalStructure("Unknown delimiter $delimiter")
       }
     readContent(chars)
+    }
+
+  private fun readInlineCode(chars: CharIterator) {
+    val target = this
+    val builder = StringBuilder()
+    while (chars.hasNext()) {
+      val next = chars.next()
+      if (next == '`') {
+        add(Content(this, builder.toString()))
+        return
+        }
+      builder.append(next)
+      }
+    throw IllegalStructure("missing ' in inline reference")
     }
 
   private fun readReference(chars: CharIterator): Reference {

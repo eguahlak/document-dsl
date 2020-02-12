@@ -44,7 +44,7 @@ fun Folder.full() = document("full", "Main Page") {
         paragraph("Third")
         list(Listing.Type.ARABIC) {
           //section("In a list?") {
-            paragraph("some content with {*P1*:/slides-01} and {KOTLIN} look in section: {sec=second}")
+            paragraph("some `content` with {*P1*:/slides-01} and {KOTLIN} `look_in` section: {sec=second}")
           //}
           paragraph("Uno")
           paragraph("Due")

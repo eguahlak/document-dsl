@@ -8,7 +8,7 @@ class Configuration(
     val hasNumbers: Boolean = false,
     val outputLevel: OutputLevel = OutputLevel.WARNING
     ) {
-  enum class OutputLevel { NONE, WARNING, INFO, VERBOSE }
+  enum class OutputLevel { NONE, ERROR, WARNING, INFO, VERBOSE }
   val properties = mutableMapOf<String, String>()
   val contextRoot: String
   val root: File
