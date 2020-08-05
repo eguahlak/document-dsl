@@ -2,6 +2,10 @@ package dk.kalhauge.document.dsl
 
 import java.io.File
 
+object CourseContext {
+  val root: String = this::class.java.classLoader.getResource(".").path.substringBeforeLast("/dsl/build")
+  }
+
 class Configuration(
     courseRoot: String? = null,
     val hasTitle: Boolean = false,
@@ -25,7 +29,7 @@ class Configuration(
       }
     this.contextRoot = courseRoot
         ?: properties["context.root"]
-        ?: this::class.java.classLoader.getResource(".").path.substringBeforeLast("/dsl/build")
+        ?: CourseContext.root
     this.root = File(this.contextRoot)
     }
 

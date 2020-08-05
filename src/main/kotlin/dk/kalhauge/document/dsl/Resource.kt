@@ -20,14 +20,21 @@ sealed class Address {
         )  Web(source)
       else Disk(source)
     }
+  abstract fun toMD5(): String
   class Web(override val url: String) : Address() {
     override val label = "web=${after("//").labelize()}"
     override val title = after("//")
+    override fun toMD5() = url.toMD5()
     }
   class Disk(val path: String) : Address(){
     override val url = "file://$path"
     override val title = after("/")
     override val label = "file=${title.labelize()}"
+    override fun toMD5(): String {
+      //println("Taking MD5 of ${path.substringAfter(CourseContext.root)}")
+      return path.substringAfter(CourseContext.root).toMD5()
+      }
+
     }
   /*
   object System : Address() {
@@ -70,6 +77,7 @@ open class Resource(
   override fun toString() = "{$title:$label}"
   }
 
+
 class CachedResource(
     context: Context?,
     source: Address,
@@ -78,7 +86,8 @@ class CachedResource(
     name: String?,
     render: Boolean?
     ) : Resource(context, source, title, label) {
-  val name: String = "${source.url.toMD5()}-${name ?: source.url.substringAfterLast("/")}"
+  // val name: String = "${source.url.toMD5()}-${name ?: source.url.substringAfterLast("/")}"
+  val name: String = "${source.toMD5()}-${name ?: source.url.substringAfterLast("/")}"
   val render: Boolean = render ?: when (source.after(".")) {
     "png", "img", "jpg", "jpeg" -> true
     else -> false
