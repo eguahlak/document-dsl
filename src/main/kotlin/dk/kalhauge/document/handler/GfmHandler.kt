@@ -150,13 +150,13 @@ class GfmHandler(private val host: Host, val root: Tree.Root) {
           printLine(rowData.children.joinToString(" | ", "| ", " |") { evaluate(it) }, 0)
         is Table.FileRows -> {
           val lines = readLines(rowData.filename)
-          lines.forEachIndexed { index, line ->
-            if (index >= rowData.skipLineCount)
+          lines.forEachIndexed { lineIndex, line ->
+            if (lineIndex >= rowData.skipLineCount)
                 printLine(
                   splitCsvLine(line)
-                    .mapIndexed() { index, cell ->
-                      if (index > table.columns.size) cell
-                      else table.columns[index].convert(cell)
+                    .mapIndexed() { columnIndex, cell ->
+                      if (columnIndex > table.columns.size) cell
+                      else table.columns[columnIndex].convert(cell)
                       }
                     .joinToString(" | ", "| ", " |") { it }, 0
                     )
