@@ -15,9 +15,14 @@ class Table(context: Context?): Block.Child {
   override var context = context ?: FreeContext
   val columns = mutableListOf<Column>()
   val rows = mutableListOf<RowData>()
+  val criteria = mutableMapOf<String, (Row) -> Boolean>()
 
-  fun csv(filename: String) {
-    rows += FileRows(filename)
+  fun csv(filename: String, skipLineCount: Int = 0) {
+    rows += FileRows(filename, skipLineCount)
+    }
+
+  fun criterion(columnName: String, predicate: (Row) -> Boolean) {
+    criteria[columnName] = predicate
     }
 
   override fun isEmpty() = columns.isEmpty() && rows.isEmpty()

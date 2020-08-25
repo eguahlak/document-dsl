@@ -106,6 +106,14 @@ fun Folder.full() = document("full", "Main Page") {
         reference("/NO4", "T4")
         }
       }
+    section("Table from csv") {
+      table {
+        left("First Name")
+        left("Last Name")
+        left("E-mail")
+        csv("info/l20sou1ae.csv", skipLineCount = 1)
+        }
+      }
     section("Two empty tables") {
       paragraph("with hideIfEmpty = `true` (/default/)")
       table {

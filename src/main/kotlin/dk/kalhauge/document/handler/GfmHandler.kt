@@ -154,10 +154,7 @@ class GfmHandler(private val host: Host, val root: Tree.Root) {
             if (lineIndex >= rowData.skipLineCount)
                 printLine(
                   splitCsvLine(line)
-                    .mapIndexed() { columnIndex, cell ->
-                      if (columnIndex > table.columns.size) cell
-                      else table.columns[columnIndex].convert(cell)
-                      }
+                    .take(table.columns.size)
                     .joinToString(" | ", "| ", " |") { it }, 0
                     )
             }
