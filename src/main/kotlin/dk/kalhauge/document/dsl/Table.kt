@@ -72,7 +72,7 @@ class Table(context: Context?): Block.Child {
 
     }
 
-  class FileRows(val filename: String): RowData
+  class FileRows(val filename: String, val skipLineCount: Int = 0): RowData
 
   }
 
