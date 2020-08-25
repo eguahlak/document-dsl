@@ -144,19 +144,35 @@ class GfmHandler(private val host: Host, val root: Tree.Root) {
     if (table.hideIfEmpty && table.rows.isEmpty()) return
     printLine(table.columns.joinToString(" | ", "| ", " |") { evaluate(it.title) }, 0)
     printLine(table.columns.joinToString(" | ", "| ", " |") { evaluate(it.alignment) }, 0)
+
+    // TODO: Clean this mess up
     table.rows.forEach { rowData ->
       when (rowData) {
-        is Table.Row ->
-          printLine(rowData.children.joinToString(" | ", "| ", " |") { evaluate(it) }, 0)
+        is Table.Row -> {
+          val values = rowData.children.mapIndexed { index, child ->
+            table.columns[index].convert(evaluate(child))
+            }
+          val useLine = values.foldIndexed(true) { index, acc, value ->
+              acc && table.columns[index].criterion(value)
+              }
+          if (useLine)
+              printLine(values.joinToString(" | ", "| ", " |"), 0)
+          }
         is Table.FileRows -> {
           val lines = readLines(rowData.filename)
           lines.forEachIndexed { lineIndex, line ->
-            if (lineIndex >= rowData.skipLineCount)
-                printLine(
-                  splitCsvLine(line)
-                    .take(table.columns.size)
-                    .joinToString(" | ", "| ", " |") { it }, 0
-                    )
+            if (lineIndex >= rowData.skipLineCount) {
+              val values = splitCsvLine(line)
+                  .take(table.columns.size)
+                  .mapIndexed { index, value ->
+                    table.columns[index].convert(value)
+                    }
+              val useLine = values.foldIndexed(true) { index, acc, value ->
+                  acc && table.columns[index].criterion(value)
+                  }
+              if (useLine)
+                  printLine(values.joinToString(" | ", "| ", " |") { it }, 0)
+              }
             }
           }
         }

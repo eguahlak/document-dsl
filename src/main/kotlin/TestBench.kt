@@ -109,9 +109,21 @@ fun Folder.full() = document("full", "Main Page") {
     section("Table from csv") {
       table {
         left("First Name")
-        left("Last Name")
+        left("Last Name") { it.toUpperCase() }
         left("E-mail")
+        row {
+          paragraph("Martin")
+          paragraph("Kurt")
+          paragraph("abc@mail.dk")
+          }
+        row {
+          paragraph("Marianne")
+          paragraph("Herbert")
+          paragraph("andersen@mail.dk")
+          }
         csv("info/l20sou1ae.csv", skipLineCount = 1)
+        criterion(1) { it.length > 6 }
+        criterion(0) { it.startsWith("M") }
         }
       }
     section("Two empty tables") {

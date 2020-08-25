@@ -15,14 +15,18 @@ class Table(context: Context?): Block.Child {
   override var context = context ?: FreeContext
   val columns = mutableListOf<Column>()
   val rows = mutableListOf<RowData>()
-  val criteria = mutableMapOf<String, (Row) -> Boolean>()
 
   fun csv(filename: String, skipLineCount: Int = 0) {
     rows += FileRows(filename, skipLineCount)
     }
 
-  fun criterion(columnName: String, predicate: (Row) -> Boolean) {
-    criteria[columnName] = predicate
+  fun criterion(columnIndex: Int, predicate: (String) -> Boolean) {
+    if (0 <= columnIndex && columnIndex < columns.size)
+        columns[columnIndex].criterion = predicate
+    }
+
+  fun criterion(columnName: String, predicate: (String) -> Boolean) {
+    criterion(columns.indexOfFirst { it.name == columnName }, predicate)
     }
 
   override fun isEmpty() = columns.isEmpty() && rows.isEmpty()
@@ -59,8 +63,11 @@ class Table(context: Context?): Block.Child {
     val index = table.columns.size
     val name = name ?: title
     var title = text(title)
+    var criterion: (String) -> Boolean = { true }
 
-    init { table.columns += this }
+    init {
+      table.columns += this
+      }
     }
 
   interface RowData
