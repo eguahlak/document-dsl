@@ -11,7 +11,7 @@ fun URL.copyTo(target: File, skip: (File) -> Boolean = { false }) {
   }
 
 fun splitCsvLine(line: String) =
-  """( *"([^"]*)")|([^";]+ *)""".toRegex().findAll(line)
+  """( *"([^"]*)")|([^";,]+ *)""".toRegex().findAll(line)
     .map {
       when  {
         it.groups[3] != null -> it.groupValues[3].trim()
@@ -23,7 +23,13 @@ fun splitCsvLine(line: String) =
 
 /*
 fun main() {
-  val line = "\"Alex Langhoff\"; \"cph-al279@cphbusiness.dk\""
+  var line = """"Alex Langhoff"; "cph-al279@cphbusiness.dk""""
+  splitCsvLine(line).forEach { println(it) }
+  line = """Alex Langhoff; "cph-al279@cphbusiness.dk""""
+  splitCsvLine(line).forEach { println(it) }
+  line = """Alex Langhoff, "cph-al279@cphbusiness.dk""""
+  splitCsvLine(line).forEach { println(it) }
+  line = """"Alex, Langhoff", "cph-al279@cphbusiness.dk""""
   splitCsvLine(line).forEach { println(it) }
   }
 */
