@@ -146,36 +146,11 @@ class GfmHandler(private val host: Host, val root: Tree.Root) {
     printLine(table.columns.joinToString(" | ", "| ", " |") { evaluate(it.alignment) }, 0)
 
     // TODO: Clean this mess up
-    table.rows.forEach { rowData ->
-      when (rowData) {
-        is Table.Row -> {
-          val values = rowData.children.mapIndexed { index, child ->
-            table.columns[index].convert(evaluate(child))
-            }
-          val useLine = values.foldIndexed(true) { index, acc, value ->
-              acc && table.columns[index].criterion(value)
-              }
-          if (useLine)
-              printLine(values.joinToString(" | ", "| ", " |"), 0)
-          }
-        is Table.FileRows -> {
-          val lines = readLines(rowData.filename)
-          lines.forEachIndexed { lineIndex, line ->
-            if (lineIndex >= rowData.skipLineCount) {
-              val values = splitCsvLine(line)
-                  .take(table.columns.size)
-                  .mapIndexed { index, value ->
-                    table.columns[index].convert(value)
-                    }
-              val useLine = values.foldIndexed(true) { index, acc, value ->
-                  acc && table.columns[index].criterion(value)
-                  }
-              if (useLine)
-                  printLine(values.joinToString(" | ", "| ", " |") { it }, 0)
-              }
-            }
-          }
+    table.allRows(host).forEach { row ->
+      val values = row.children.mapIndexed { index, child ->
+        table.columns[index].convert(evaluate(child))
         }
+      printLine(values.joinToString(" | ", "| ", " |"), 0)
       }
     if (table.rows.isEmpty())
       printLine("|"+(table.columns.size of "  |" ), 0)

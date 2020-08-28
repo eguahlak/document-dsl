@@ -10,7 +10,11 @@ import java.io.IOException
 import java.io.PrintWriter
 import java.net.URL
 
-interface Host {
+interface LineSource {
+  fun readLines(filename: String): List<String>
+  }
+
+interface Host : LineSource {
   val configuration: Configuration
   var indent: Int
   fun print(text: String?)
@@ -23,14 +27,12 @@ interface Host {
     }
   fun updateFile(sourcePath: String, targetPath: String)
   fun downloadFile(url: String, targetPath: String)
-  fun readLines(filename: String): List<String>
   }
 
 class ConsoleHost(override val configuration: Configuration) : Host {
-  val filenames = stackOf<String>()
+  private val filenames = stackOf<String>()
 
   override var indent: Int = 0
-    get() = field
     set(value) {
       field = value
       if (field < 0) throw IllegalArgumentException("Indent can't be negative")
@@ -71,16 +73,15 @@ class ConsoleHost(override val configuration: Configuration) : Host {
   }
 
 class FileHost(override val configuration: Configuration) : Host {
-  val courseRoot get() = configuration.contextRoot
+  private val courseRoot get() = configuration.contextRoot
   val root: File get() = configuration.root
-  val outputs = stackOf<PrintWriter>()
+  private val outputs = stackOf<PrintWriter>()
 
   private fun console(level: Configuration.OutputLevel, line: String) {
     if (configuration.outputLevel >= level) println(line)
     }
 
   override var indent: Int = 0
-    get() = field
     set(value) {
       field = value
       if (field < 0) throw IllegalArgumentException("Indent can't be negative")
@@ -103,7 +104,7 @@ class FileHost(override val configuration: Configuration) : Host {
   override fun readLines(filename: String): List<String> {
     val file = File(courseRoot, filename)
     if (file.exists()) return file.readLines()
-    else return listOf("File: ${file.absolutePath} can't be found")
+    return listOf("File: ${file.absolutePath} can't be found")
     }
 
   override fun open(filename: String) {

@@ -5,16 +5,27 @@ import dk.kalhauge.document.dsl.VerticalAlignment.*
 import dk.kalhauge.document.dsl.structure.Block
 import dk.kalhauge.document.dsl.structure.Context
 import dk.kalhauge.document.dsl.structure.FreeContext
+import dk.kalhauge.document.dsl.structure.Inline
+import dk.kalhauge.document.handler.LineSource
+import dk.kalhauge.util.splitCsvLine
 
 enum class HorizontalAlignment { LEFT, CENTER, RIGHT, JUSTIFY }
 
 enum class VerticalAlignment { TOP, MIDDLE, BOTTOM }
+
+fun Block.Child.nativeString() =
+  when (this) {
+    is Inline.Container -> this.parts.map { it.nativeString() }.firstOrNull() ?: ""
+    else -> ""
+    }
 
 class Table(context: Context?): Block.Child {
   var hideIfEmpty = true
   override var context = context ?: FreeContext
   val columns = mutableListOf<Column>()
   val rows = mutableListOf<RowData>()
+
+
 
   fun csv(filename: String, skipLineCount: Int = 0) {
     rows += FileRows(filename, skipLineCount)
@@ -51,7 +62,10 @@ class Table(context: Context?): Block.Child {
       column(title, name, JUSTIFY, convert)
 
   fun row(alignment: VerticalAlignment = TOP, build: Row.() -> Unit = {}) =
-    Row(this, alignment).also(build)
+    Row(this, alignment).also {
+      it.build()
+      rows += it
+      }
 
   class Column(
       private val table: Table,
@@ -77,18 +91,34 @@ class Table(context: Context?): Block.Child {
     override val keyPath get() = table.context.keyPath
     override fun register(target: Target) = table.context.register(target)
     override fun find(key: String) = table.context.find(key)
-
-    val index = table.rows.size
-
-    init { table.rows += this }
-
+    fun meetsCriteria() =
+      children.foldIndexed(true) { index, acc, child ->
+        acc && table.columns[index].criterion(child.nativeString())
+        }
     }
 
   class FileRows(val filename: String, val skipLineCount: Int = 0): RowData
 
+  fun allRows(source: LineSource) = sequence<Row> {
+    rows.forEach { rowData ->
+      when (rowData) {
+        is Row -> if (rowData.meetsCriteria()) yield(rowData)
+        is FileRows -> {
+          source
+            .readLines(rowData.filename)
+            .filterIndexed { index, _ -> index >= rowData.skipLineCount }
+            .forEach { line ->
+              Row(this@Table, TOP).apply {
+                  splitCsvLine(line).take(columns.size).forEach { paragraph(it) }
+                  if (meetsCriteria()) yield(this)
+                  }
+              }
+            }
+        }
+      }
+    }
+
   }
-
-
 
 fun Block.BaseParent.table(build: Table.() -> Unit = { }) =
   Table(this).also {
