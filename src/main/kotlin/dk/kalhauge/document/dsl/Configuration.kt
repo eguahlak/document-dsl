@@ -3,8 +3,7 @@ package dk.kalhauge.document.dsl
 import java.io.File
 
 object CourseContext {
-  val root: String = this::class.java.classLoader.getResource(".").path
-    .substringBeforeLast("/dsl/build").substringBeforeLast("/dsl/target/classes")
+  val root: String = this::class.java.classLoader.getResource(".").path.substringBeforeLast("/dsl/")
   }
 
 class Configuration(
