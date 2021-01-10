@@ -29,7 +29,7 @@ class Configuration(
       }
     this.contextRoot = courseRoot
         ?: properties["context.root"]
-        ?: CourseContext.root
+        ?: this::class.java.classLoader.getResource(".").path.substringBeforeLast("/dsl/")
     this.root = File(this.contextRoot)
     }
 
