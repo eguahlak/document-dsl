@@ -25,8 +25,8 @@ class Section(
 
   val number get() = customNumber ?:
       context.let { if (it is Block.Parent) it.numberOf(this) + 1 else 1 }
-  override val prefix get() =
-      context.let { if (it is Section) "${it.number}.$number " else "$number " }
+  override val prefix: String get() =
+      context.let { if (it is Section) "${it.prefix}.$number " else "$number " }
   private val forcedLevel = level
   val level: Int get() = forcedLevel ?: context.let { if (it is Section) it.level + 1 else 1}
 
@@ -70,4 +70,29 @@ fun section(
 
 fun Block.Parent.numberOf(section: Section) =
     children.filterIsInstance<Section>().indexOf(section)
+
+class AnonymousSection(context: Context?) : Block.BaseParent() {
+  val context = context ?: FreeContext
+
+  override val children = mutableListOf<Block.Child>()
+
+  override val filePath get() = context.filePath
+  override val keyPath get() = context.keyPath
+  override fun register(target: Target) = context.register(target)
+  override fun find(key: String) = context.find(key)
+
+  operator fun invoke(build: AnonymousSection.() -> Unit) { build() }
+  // TODO align with Paragraph.plusAssign
+  operator fun plusAssign(text: Text) { paragraph { add(text) } }
+  operator fun plusAssign(content: String) { plusAssign(text(content)) }
+  }
+
+fun Block.BaseParent.anonymousSection() = AnonymousSection(this)
+
+fun anonymousSection() = AnonymousSection(null)
+
+fun Block.Parent.add(anonymousSection: AnonymousSection, fallback: String? = null) {
+  if (anonymousSection.children.isEmpty() && fallback != null) add(paragraph(fallback))
+  else anonymousSection.children.forEach { add(it) }
+  }
 
