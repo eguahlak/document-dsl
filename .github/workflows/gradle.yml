@@ -13,10 +13,17 @@ jobs:
       uses: actions/setup-java@v1
       with:
         java-version: 13
+    - name: Cache Maven packages
+      uses: actions/cache@v2
+      with:
+        path: ~/.m2
+        key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
+        restore-keys: ${{ runner.os }}-m2
     - name: Build with Maven
       run: mvn --batch-mode --update-snapshots verify
     - name: Publish
       env:
         GPR_USER: ${{ secrets.GPR_USER }}
         GPR_API_KEY: ${{ secrets.GPR_API_KEY }}
-      run: mvn deploy
+        GITHUB_TOKEN: ${{ secrets.GPR_API_KEY }}
+      run: mvn --batch-mode deploy
