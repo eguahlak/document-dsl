@@ -24,5 +24,5 @@ jobs:
     - name: Publish
       env:
         USERNAME: ${{ secrets.GPR_USER }}
-        PASSWORD: ${{ secrets.GPR_API_KEY }}
+        PASSWORD: ${{ secrets.GITHUB_TOKEN }}
       run: mvn --batch-mode deploy
