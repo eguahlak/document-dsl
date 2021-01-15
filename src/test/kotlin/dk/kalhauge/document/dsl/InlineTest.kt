@@ -1,7 +1,8 @@
 package dk.kalhauge.document.dsl
 
-import org.junit.Assert.*
-import org.junit.Test
+import org.junit.jupiter.api.Test
+import kotlin.test.assertEquals
+import kotlin.test.assertTrue
 
 class InlineTest {
 

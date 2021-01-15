@@ -59,7 +59,7 @@ class Text(context: Context?, val format: Format = NORMAL) : Inline.BaseContaine
     }
 
   private fun readInlineCode(chars: CharIterator) {
-    val target = this
+    //val target = this
     val builder = StringBuilder()
     while (chars.hasNext()) {
       val next = chars.next()
