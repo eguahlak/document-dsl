@@ -23,7 +23,6 @@ jobs:
       run: mvn --batch-mode --update-snapshots verify
     - name: Publish
       env:
-        GPR_USER: ${{ secrets.GPR_USER }}
-        GPR_API_KEY: ${{ secrets.GPR_API_KEY }}
-        GITHUB_TOKEN: ${{ secrets.GPR_API_KEY }}
+        USERNAME: ${{ secrets.GPR_USER }}
+        PASSWORD: ${{ secrets.GPR_API_KEY }}
       run: mvn --batch-mode deploy
