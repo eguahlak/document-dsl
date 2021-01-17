@@ -23,6 +23,9 @@ jobs:
       run: mvn --batch-mode --update-snapshots verify
     - name: Publish
       env:
-        USERNAME: ${{ secrets.GPR_USER }}
-        PASSWORD: ${{ secrets.GITHUB_TOKEN }}
-      run: mvn --batch-mode deploy
+        # USERNAME: ${{ secrets.GPR_USER }}
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      run: |
+        mkdir ~/.m2
+        echo "<settings><servers><server><id>eguahlak.dsl</id><username>eguahlak</username><password>${GITHUB_TOKEN}</password></server></servers></settings>" > ~/.m2/settings.xml
+        mvn --batch-mode deploy
