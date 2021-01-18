@@ -2,10 +2,12 @@ package dk.kalhauge.document.handler
 
 import dk.kalhauge.document.dsl.*
 import dk.kalhauge.document.dsl.Text.Format.*
+import dk.kalhauge.document.dsl.graphs.Graph
 import dk.kalhauge.document.dsl.structure.*
 import dk.kalhauge.util.*
 
 class GfmHandler(private val host: Host, val root: Tree.Root) {
+  val graphHandler: GraphHandler = GraphvizHandler(host)
 
   fun handle(printTargets: Boolean = false) {
     if (printTargets) {
@@ -43,6 +45,7 @@ class GfmHandler(private val host: Host, val root: Tree.Root) {
         is Section -> handle(it)
         is Capture -> handle(it)
         is Paragraph -> handle(it)
+        is Graph -> handle(it)
         is Code -> handle(it)
         is Listing -> handle(it)
         is Table -> handle(it)
@@ -103,6 +106,10 @@ class GfmHandler(private val host: Host, val root: Tree.Root) {
         }
       printLine()
       }
+    }
+
+  private fun handle(graph: Graph) {
+    graphHandler.handle(graph)
     }
 
   private fun handle(capture: Capture) = with (host) {

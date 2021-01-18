@@ -1,4 +1,5 @@
 import dk.kalhauge.document.dsl.*
+import dk.kalhauge.document.dsl.graphs.graph
 import dk.kalhauge.document.dsl.structure.root
 import dk.kalhauge.document.handler.FileHost
 import dk.kalhauge.document.handler.GfmHandler
@@ -20,7 +21,16 @@ fun Folder.full() = document("full", "Main Page") {
         reference(r1)
         reference("../week-06/info", "Go to week 6")
         }
-
+      graph("A Graph", "GRAPHA", "GRAPHA") {
+        val GRAPHT = box("Graph Theory")
+        val c1 = cluster("Databases") {
+          val SQL = box("SQL Server")
+          val DB = ellipse("Databases")
+          val GRAPH_DB = ellipse("Graph DB")
+          SQL.edge(DB)
+          }
+        c1["Graph DB"]?.edge(GRAPHT)
+        }
       paragraph {
         image(Address("/Users/AKA/Pictures/Michellaneous/raven.png"), name = "raven.png")
         image(Address("$imageRoot/raven.png"), name = "raven.png")

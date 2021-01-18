@@ -6,6 +6,16 @@ import kotlin.test.assertEquals
 class StringTests {
 
   @Test
+  fun test8gives08() {
+    assertEquals("08", 8.hex)
+    }
+
+  @Test
+  fun test29gives1D() {
+    assertEquals("1D", 29.hex)
+    }
+
+  @Test
   fun testCommonRoot() {
     assertEquals(
       "../../ALG/cache/pic.png",

@@ -4,10 +4,14 @@ import java.security.MessageDigest
 
 fun String.labelize() = toLowerCase().replace("[^a-z0-9.]+".toRegex(), "-")
 
+fun String.id() =
+  this.split(" +".toRegex()).map { it.toUpperCase()[0] }.joinToString(separator = "")+(this.toMD5())
+
 infix fun Int.of(text: String) = (1..this).map { text }.joinToString(separator = "")
 
 val String.back: String get() = this.replace("[^/]+".toRegex(), "..")
 
+val Int.hex: String get() = ("0"+this.toString(16)).takeLast(2).toUpperCase()
 
 infix fun String.from(other: String): String {
   val target = pathOf(normalize(other, this).split('/'))
