@@ -41,16 +41,19 @@ class Vertex(
   val edges = mutableListOf<Edge>()
 
   fun edge(
-    target: Vertex,
-    style: Cluster.Style = Cluster.Style.SOLID,
-    color: RGB = RGB.BLACK,
-    arrowHead: Edge.ArrowHead = Edge.ArrowHead.WEE,
-    build: Edge.() -> Unit = {}
-      ) = Edge(target, style, color, arrowHead).also { edge ->
-    edge.build()
-    edges.add(edge)
+      target: Vertex?,
+      style: Cluster.Style = Cluster.Style.SOLID,
+      color: RGB = RGB.BLACK,
+      arrowHead: Edge.ArrowHead = Edge.ArrowHead.WEE,
+      build: Edge.() -> Unit = {}
+      ) =
+    if (target != null)
+        Edge(target, style, color, arrowHead).also { edge ->
+          edge.build()
+          edges.add(edge)
+          }
+    else null
     }
-  }
 
 
 interface SubGraph {

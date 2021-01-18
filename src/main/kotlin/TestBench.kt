@@ -1,4 +1,5 @@
 import dk.kalhauge.document.dsl.*
+import dk.kalhauge.document.dsl.graphs.Edge
 import dk.kalhauge.document.dsl.graphs.graph
 import dk.kalhauge.document.dsl.structure.root
 import dk.kalhauge.document.handler.FileHost
@@ -28,6 +29,7 @@ fun Folder.full() = document("full", "Main Page") {
           val DB = ellipse("Databases")
           val GRAPH_DB = ellipse("Graph DB")
           SQL.edge(DB)
+          GRAPH_DB.edge(DB, arrowHead = Edge.ArrowHead.OPEN_TRIANGLE)
           }
         c1["Graph DB"]?.edge(GRAPHT)
         }

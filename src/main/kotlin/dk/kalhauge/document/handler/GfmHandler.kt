@@ -108,8 +108,9 @@ class GfmHandler(private val host: Host, val root: Tree.Root) {
       }
     }
 
-  private fun handle(graph: Graph) {
+  private fun handle(graph: Graph) = with(host) {
     graphHandler.handle(graph)
+    printLine("![${graph.cluster.title}](${graph.name}.png)")
     }
 
   private fun handle(capture: Capture) = with (host) {

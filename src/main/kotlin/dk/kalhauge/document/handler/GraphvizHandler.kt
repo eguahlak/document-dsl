@@ -9,7 +9,7 @@ import dk.kalhauge.util.id
 class GraphvizHandler(val host: Host) : GraphHandler {
 
   override fun handle(graph: Graph) = with(host) {
-    val filename = "${graph.context.filePath}/${graph.name}.gv"
+    val filename = "${graph.context.filePath.substringBeforeLast("/")}/${graph.name}.gv"
     open(filename)
     printLine(
       """
