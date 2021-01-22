@@ -25,6 +25,7 @@ class GfmHandler(private val host: Host, val root: Tree.Root) {
         else -> TODO("Handling for new context type: $it")
         }
       }
+    graphHandler.postProcess()
     }
 
   private fun handle(folder: Folder) {
@@ -110,7 +111,7 @@ class GfmHandler(private val host: Host, val root: Tree.Root) {
 
   private fun handle(graph: Graph) = with(host) {
     graphHandler.handle(graph)
-    printLine("![${graph.cluster.title}](${graph.name}.png)")
+    printLine("${if (graph.inline) "!" else ""}[${graph.cluster.title}](${graph.name}.png)")
     }
 
   private fun handle(capture: Capture) = with (host) {

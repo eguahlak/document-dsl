@@ -4,6 +4,7 @@ import dk.kalhauge.document.dsl.graphs.Cluster
 import dk.kalhauge.document.dsl.graphs.Edge
 import dk.kalhauge.document.dsl.graphs.Graph
 import dk.kalhauge.document.dsl.graphs.Vertex
+import dk.kalhauge.util.Docker
 import dk.kalhauge.util.id
 
 class GraphvizHandler(val host: Host) : GraphHandler {
@@ -23,6 +24,20 @@ class GraphvizHandler(val host: Host) : GraphHandler {
       |  }  
       """.trimMargin())
     close()
+    }
+
+  override fun postProcess() {
+    val repository = "eguahlak/graphvizzer:1.0.0"
+    try {
+      Docker.pull(repository)?.container {
+        //ports()
+        mounts("${host.configuration.contextRoot}/docs" to "/graphs")
+        }?.start()
+      println("*.gv files processed to *.png files")
+      }
+    catch (e: Exception) {
+      println("Cannot start docker container with image $repository")
+      }
     }
 
   fun handle(cluster: Cluster, indent: String): Unit = with(host) {

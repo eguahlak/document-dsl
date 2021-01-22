@@ -60,9 +60,10 @@ interface SubGraph {
 
   }
 
-class Graph(context: Context?, title: String, val name: String, val label: String): Block.Child, SubGraph {
+class Graph(context: Context?, title: String, val name: String): Block.Child, SubGraph {
   override var context = context ?: FreeContext
   override fun isEmpty() = cluster.isEmpty()
+  var inline = true
   val cluster = Cluster(this, title)
   }
 
@@ -122,8 +123,8 @@ class Cluster(val parent: SubGraph, val title: String): SubGraph {
 
   }
 
-fun Block.BaseParent.graph(title: String, name: String, label: String, build: Cluster.() -> Unit = {}) =
-    Graph(this, title, name, label).also { graph ->
+fun Block.BaseParent.graph(title: String, name: String, build: Cluster.() -> Unit = {}) =
+    Graph(this, title, name).also { graph ->
       graph.cluster.build()
       add(graph)
       }

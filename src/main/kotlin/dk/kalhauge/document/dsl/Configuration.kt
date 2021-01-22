@@ -1,6 +1,7 @@
 package dk.kalhauge.document.dsl
 
 import java.io.File
+import java.nio.charset.Charset
 
 object CourseContext {
   val root: String = this::class.java.classLoader.getResource(".").path.substringBeforeLast("/dsl/")
@@ -43,7 +44,7 @@ class Configuration(
       }
 
   fun loadProperties(name: String) {
-    this::class.java.classLoader.getResourceAsStream(name).bufferedReader().use { reader ->
+    this::class.java.classLoader.getResourceAsStream(name).bufferedReader(Charsets.UTF_8).use { reader ->
       reader.lines().forEach { line ->
         val parts = line.split('=', ':').map { it.trim().substringBefore("#") }
         when (parts.size) {

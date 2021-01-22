@@ -4,4 +4,5 @@ import dk.kalhauge.document.dsl.graphs.Graph
 
 interface GraphHandler {
   fun handle(graph: Graph)
+  fun postProcess()
   }
