@@ -27,9 +27,11 @@ fun Folder.full() = document("full", "Main Page") {
         val c1 = cluster("Databases") {
           val SQL = box("SQL Server")
           val DB = ellipse("Databases")
+          val DOC_DB = ellipse("Document Database")
           val GRAPH_DB = ellipse("Graph DB")
           SQL.edge(DB)
           GRAPH_DB.edge(DB, arrowHead = Edge.ArrowHead.OPEN_TRIANGLE)
+          DOC_DB.edge(DB, arrowHead = Edge.ArrowHead.OPEN_TRIANGLE)
           }
         c1["Graph DB"]?.edge(GRAPHT)
         }

@@ -35,7 +35,7 @@ object Docker {
         }
       }
 
-  class Container(val image: Image) {
+  class Container(val image: Image) : AutoCloseable {
       var id: String = ""
       val portBindings = mutableListOf<PortBinding>()
       val mountBindings = mutableListOf<Bind>()
@@ -48,15 +48,28 @@ object Docker {
       mountBindings.addAll(bindings.map { Bind.parse("${it.first}:${it.second}") })
       }
 
-    fun start() {
+    fun start() : Container {
       var config = HostConfig()
       if (mountBindings.isNotEmpty()) config = config.withBinds(mountBindings)
       if (portBindings.isNotEmpty()) config = config.withPortBindings(portBindings)
       val response = image.client.createContainerCmd(image.repository)
         .withHostConfig(config)
+        .withEnv("""LANG="C.UTF-8"""")
         .exec()
       id = response.id
       image.client.startContainerCmd(response.id).exec()
+      return this
+      }
+
+    fun stop() {
+      //println("stopping $id ...")
+      image.client.stopContainerCmd(id).exec()
+      }
+
+    override fun close() {
+      //println("closing $id ...")
+      if (image.client.inspectContainerCmd(id).exec().state.running ?: false) stop()
+      image.client.removeContainerCmd(id).exec()
       }
 
     }

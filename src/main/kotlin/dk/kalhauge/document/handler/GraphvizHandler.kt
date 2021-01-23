@@ -15,6 +15,7 @@ class GraphvizHandler(val host: Host) : GraphHandler {
     printLine(
       """
       |digraph ${graph.cluster.title.id()} {
+      |  charset = "UTF-8";
       |  label = "${graph.cluster.title}";
       |  rankdir = "${graph.cluster.direction}"
       """.trimMargin(), 0)
@@ -27,12 +28,13 @@ class GraphvizHandler(val host: Host) : GraphHandler {
     }
 
   override fun postProcess() {
-    val repository = "eguahlak/graphvizzer:1.0.0"
+    val repository = "eguahlak/graphvizzer:1.1.0"
     try {
+      println("Preparing to process graphical files ...")
       Docker.pull(repository)?.container {
         //ports()
         mounts("${host.configuration.contextRoot}/docs" to "/graphs")
-        }?.start()
+        }?.start().use { /* calls close on exit */ }
       println("*.gv files processed to *.png files")
       }
     catch (e: Exception) {
