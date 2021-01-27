@@ -1,9 +1,6 @@
 package dk.kalhauge.document.handler
 
-import dk.kalhauge.document.dsl.graphs.Cluster
-import dk.kalhauge.document.dsl.graphs.Edge
-import dk.kalhauge.document.dsl.graphs.Graph
-import dk.kalhauge.document.dsl.graphs.Vertex
+import dk.kalhauge.document.dsl.graphs.*
 import dk.kalhauge.util.Docker
 import dk.kalhauge.util.id
 
@@ -45,7 +42,7 @@ class GraphvizHandler(val host: Host) : GraphHandler {
   fun handle(cluster: Cluster, indent: String): Unit = with(host) {
     if (cluster.isRoot()) {
       cluster.vertices.forEach { handle(it, "$indent") }
-      cluster.clusters.forEach { it -> handle(it, "$indent") }
+      cluster.clusters.forEach { handle(it, "$indent") }
       cluster.vertices.forEach { vertice ->
         vertice.edges.forEach { edge -> handle(vertice, edge, "$indent") }
         }
@@ -68,14 +65,38 @@ class GraphvizHandler(val host: Host) : GraphHandler {
 
 
 
-  fun handle(vertex: Vertex, indent: String) = with(host) {
-    printLine("""${indent}${vertex.title.id()} [label="${vertex.title}",${evaluate(vertex.shape)}];""", 0)
+  fun handle(vertex: Vertex, indent: String) = with (host) {
+    val arguments = with (vertex) { listOf(evaluate(title),evaluate(shape),evaluate(style),colors(this)) }
+    printLine(
+      """${indent}${vertex.title.id()} ${arguments.joinToString(",", "[", "]")};""",
+      0)
     // TODO add style, color and fill
     }
 
   fun handle(source: Vertex, edge: Edge, indent: String) = with(host) {
-    printLine("""${indent}${source.title.id()} -> ${edge.target.title.id()} [${evaluate(edge.arrowHead)}];""", 0)
+    val arguments = with (edge) { listOf(evaluate(style), evaluate(arrowHead), colors(this)) }
+    printLine(
+      """${indent}${source.title.id()} -> ${edge.target.title.id()} ${arguments.joinToString(",", "[", "]")};""",
+      0)
     }
+
+  fun colors(vertex: Vertex): String = with(vertex) {
+    """color="${color}""""+
+    (if (fill != RGB.INVISIBLE) """,style=filled,fillcolor="${fill.light}"""" else "")
+    }
+
+  fun colors(edge: Edge): String = with(edge) {
+    """color="${color}""""
+    }
+
+  fun evaluate(label: String) = """label="$label""""
+
+  fun evaluate(style: Cluster.Style) =
+      when(style) {
+        Cluster.Style.DASHED -> "style=dashed"
+        Cluster.Style.DOTTED -> "style=dottet"
+        Cluster.Style.SOLID -> "style=solid"
+        }
 
   fun evaluate(shape: Vertex.Shape) =
       when (shape) {

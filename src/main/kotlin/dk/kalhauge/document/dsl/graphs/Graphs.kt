@@ -8,14 +8,18 @@ import dk.kalhauge.util.hex
 
 class RGB(val red: Int, val green: Int, val blue: Int, val alpha: Int = 255) {
   companion object {
-    val RED = RGB(255, 0, 0)
-    val GREEB = RGB(0, 255, 0)
-    val BLUE = RGB(0, 0, 255)
-    val GRAY = RGB(85, 85, 85)
+    val RED = RGB(180, 0, 0)
+    val GREEN = RGB(0, 180, 0)
+    val BLUE = RGB(0, 0, 180)
+    val GRAY = RGB(60, 60, 60)
     val BLACK = RGB(0, 0, 0)
     val INVISIBLE = RGB(0, 0, 0, 0)
     val WHITE = RGB(255, 255, 255)
     }
+
+  private fun brighten(color: Int) = 255 - (255 - color)/8
+
+  val light: RGB get() = RGB(brighten(red), brighten(green), brighten(blue), alpha)
 
   override fun toString() = "#${red.hex}${green.hex}${blue.hex}${alpha.hex}"
   }
@@ -43,8 +47,8 @@ class Vertex(
   fun edge(
       target: Vertex?,
       style: Cluster.Style = Cluster.Style.SOLID,
-      color: RGB = RGB.BLACK,
       arrowHead: Edge.ArrowHead = Edge.ArrowHead.WEE,
+      color: RGB = RGB.BLACK,
       build: Edge.() -> Unit = {}
       ) =
     if (target != null)

@@ -1,5 +1,7 @@
 import dk.kalhauge.document.dsl.*
+import dk.kalhauge.document.dsl.graphs.Cluster
 import dk.kalhauge.document.dsl.graphs.Edge
+import dk.kalhauge.document.dsl.graphs.RGB
 import dk.kalhauge.document.dsl.graphs.graph
 import dk.kalhauge.document.dsl.structure.root
 import dk.kalhauge.document.handler.FileHost
@@ -26,12 +28,14 @@ fun Folder.full() = document("full", "Main Page") {
         val GRAPHT = box("Graph Theory")
         val c1 = cluster("Databases") {
           val SQL = box("SQL Server")
-          val DB = ellipse("Databases")
-          val DOC_DB = ellipse("Document Database")
+          val DB = ellipse("Databases", color = RGB.RED, fill = RGB.RED)
+          val DOC_DB = ellipse("Document Database", fill = RGB.GRAY)
           val GRAPH_DB = ellipse("Graph DB")
+          val BASIC_SQL = ellipse("Basic SQL", Cluster.Style.DASHED, fill = RGB.BLUE)
           SQL.edge(DB)
+          SQL.edge(BASIC_SQL, arrowHead = Edge.ArrowHead.TRIANGLE, color = RGB.GREEN)
           GRAPH_DB.edge(DB, arrowHead = Edge.ArrowHead.OPEN_TRIANGLE)
-          DOC_DB.edge(DB, arrowHead = Edge.ArrowHead.OPEN_TRIANGLE)
+          DOC_DB.edge(DB, arrowHead = Edge.ArrowHead.OPEN_TRIANGLE, color = RGB.BLUE)
           }
         c1["Graph DB"]?.edge(GRAPHT)
         }
