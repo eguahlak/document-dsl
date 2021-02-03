@@ -39,6 +39,18 @@ fun Folder.full() = document("full", "Main Page") {
           }
         c1["Graph DB"]?.edge(GRAPHT)
         }
+      graph("Be a Graph", "GRAPHB") {
+        val GRAPHT = box("Graph Theory")
+        val SQL = box("SQL Server")
+        val DB = ellipse("Databases", color = RGB.RED, fill = RGB.RED)
+        val DOC_DB = ellipse("Document Database", fill = RGB.GRAY)
+        val GRAPH_DB = ellipse("Graph DB")
+        val BASIC_SQL = ellipse("Basic SQL", Cluster.Style.DASHED, fill = RGB.BLUE)
+        SQL.edge(DB)
+        SQL.edge(BASIC_SQL, arrowHead = Edge.ArrowHead.TRIANGLE, color = RGB.GREEN)
+        GRAPH_DB.edge(DB, arrowHead = Edge.ArrowHead.OPEN_TRIANGLE)
+        DOC_DB.edge(DB, arrowHead = Edge.ArrowHead.OPEN_TRIANGLE, color = RGB.BLUE)
+        }
       paragraph {
         image(Address("/Users/AKA/Pictures/Michellaneous/raven.png"), name = "raven.png")
         image(Address("$imageRoot/raven.png"), name = "raven.png")

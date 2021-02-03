@@ -41,6 +41,7 @@ class GraphvizHandler(val host: Host) : GraphHandler {
 
   fun handle(cluster: Cluster, indent: String): Unit = with(host) {
     if (cluster.isRoot()) {
+      println("handle root cluster")
       cluster.vertices.forEach { handle(it, "$indent") }
       cluster.clusters.forEach { handle(it, "$indent") }
       cluster.vertices.forEach { vertice ->
@@ -66,7 +67,7 @@ class GraphvizHandler(val host: Host) : GraphHandler {
 
 
   fun handle(vertex: Vertex, indent: String) = with (host) {
-    val arguments = with (vertex) { listOf(evaluate(title),evaluate(shape),evaluate(style),colors(this)) }
+    val arguments = listOf(labelOf(vertex), shapeOf(vertex),styleOf(vertex),colorsOf(vertex))
     printLine(
       """${indent}${vertex.title.id()} ${arguments.joinToString(",", "[", "]")};""",
       0)
@@ -74,43 +75,54 @@ class GraphvizHandler(val host: Host) : GraphHandler {
     }
 
   fun handle(source: Vertex, edge: Edge, indent: String) = with(host) {
-    val arguments = with (edge) { listOf(evaluate(style), evaluate(arrowHead), colors(this)) }
+    val arguments = listOf(styleOf(edge), shapeOf(edge), colorsOf(edge))
     printLine(
       """${indent}${source.title.id()} -> ${edge.target.title.id()} ${arguments.joinToString(",", "[", "]")};""",
       0)
     }
 
-  fun colors(vertex: Vertex): String = with(vertex) {
+  fun colorsOf(vertex: Vertex): String = with(vertex) {
     """color="${color}""""+
-    (if (fill != RGB.INVISIBLE) """,style=filled,fillcolor="${fill.light}"""" else "")
+    (if (fill != RGB.INVISIBLE) """,fillcolor="${fill.light}"""" else "")
     }
 
-  fun colors(edge: Edge): String = with(edge) {
+  fun colorsOf(edge: Edge): String = with(edge) {
     """color="${color}""""
     }
 
-  fun evaluate(label: String) = """label="$label""""
+  fun styleOf(vertex: Vertex) = with(vertex) {
+    if (fill == RGB.INVISIBLE) "style=${evaluate(style)}"
+    else """style="${evaluate(style)},filled""""
+    }
+
+  fun styleOf(edge: Edge) = "style=${evaluate(edge.style)}"
+
+  fun labelOf(vertex: Vertex) = """label="${vertex.title}""""
+
+  fun shapeOf(vertex: Vertex) = """shape=${evaluate(vertex.shape)}"""
+
+  fun shapeOf(edge: Edge) = """arrowhead=${evaluate(edge.arrowHead)}"""
 
   fun evaluate(style: Cluster.Style) =
       when(style) {
-        Cluster.Style.DASHED -> "style=dashed"
-        Cluster.Style.DOTTED -> "style=dottet"
-        Cluster.Style.SOLID -> "style=solid"
+        Cluster.Style.DASHED -> "dashed"
+        Cluster.Style.DOTTED -> "dottet"
+        Cluster.Style.SOLID -> "solid"
         }
 
   fun evaluate(shape: Vertex.Shape) =
       when (shape) {
-        Vertex.Shape.BOX -> "shape=box"
-        Vertex.Shape.ELLIPSE -> "shape=ellipse"
-        Vertex.Shape.CIRCLE -> "shape=circle"
+        Vertex.Shape.BOX -> "box"
+        Vertex.Shape.ELLIPSE -> "ellipse"
+        Vertex.Shape.CIRCLE -> "circle"
         }
 
   fun evaluate(arrowHead: Edge.ArrowHead) =
       when (arrowHead) {
-        Edge.ArrowHead.TRIANGLE -> "arrowhead=normal"
-        Edge.ArrowHead.OPEN_TRIANGLE -> "arrowhead=onormal"
-        Edge.ArrowHead.WEE -> "arrowhead=vee"
-        Edge.ArrowHead.NONE -> "arrowhead=none"
+        Edge.ArrowHead.TRIANGLE -> "normal"
+        Edge.ArrowHead.OPEN_TRIANGLE -> "onormal"
+        Edge.ArrowHead.WEE -> "vee"
+        Edge.ArrowHead.NONE -> "none"
         }
 
   }
